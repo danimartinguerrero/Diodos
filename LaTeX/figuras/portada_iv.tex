@@ -1,0 +1,14 @@
+% Figura de la portada: I-V de los LED (datos simulados)
+\begin{tikzpicture}
+\begin{axis}[width=5.9cm,height=4.6cm,
+  xmin=0.6,xmax=3.4,ymin=-0.15,ymax=4.1,
+  xlabel={$\VD$ (V)},ylabel={$\ID$ (mA)},
+  xlabel style={font=\scriptsize,yshift=3pt},ylabel style={font=\scriptsize,yshift=-4pt},
+  tick label style={font=\tiny},grid=major,
+  axis background/.style={fill=white}]
+  \foreach \col/\fic in {cIR/ir,cRojo/rojo,cAmarillo/amarillo,cVerde/verde,cAzul/azul,cUV/uv}{
+    \edef\temp{\noexpand\addplot[\col,thick,mark=*,mark size=.7pt]
+      table[x=VD,y=ID]{datos/iv_\fic.dat};}
+    \temp}
+\end{axis}
+\end{tikzpicture}

@@ -1,0 +1,16 @@
+% Circuito de caracterización R-LED con el DAQ
+\begin{circuitikz}[font=\small,
+  term/.style={-{Straight Barb[length=4pt]Straight Barb[length=4pt]},thick}]
+  \draw (2,5) to[R,l_=$R$,i>^=$\ID$] (2,2.2) coordinate (n);
+  \draw (n) to[leD*,l_=LED] (2,0) coordinate (g);
+  \draw[term] (2,5) -- (0.3,5) node[left,cRojo!85!black,font=\bfseries]{AO-0};
+  \draw[term] (n) -- (3.8,2.2) node[right,cAzul!85!black,font=\bfseries]{AI-1};
+  \draw[term] (g) -- (3.8,0) node[right,font=\bfseries]{GND};
+  \draw (g) -- (2,-0.3) node[ground]{};
+  \fill (n) circle (1.8pt) (g) circle (1.8pt);
+  \node[above left,azul,font=\scriptsize] at (2.05,1.7) {A};
+  \node[below left,azul,font=\scriptsize] at (2.05,0.55) {K};
+  % tensiones
+  \draw[-{Stealth[length=6pt]},rojoaviso,thick] (0.6,0.1) -- node[left]{$\Vin$} (0.6,4.6);
+  \draw[-{Stealth[length=6pt]},rojoaviso,thick] (3.3,0.1) -- node[right]{$\VD$} (3.3,1.95);
+\end{circuitikz}

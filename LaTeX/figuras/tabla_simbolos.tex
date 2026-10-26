@@ -1,0 +1,21 @@
+% Tabla de símbolos de diodos (circuitikz)
+\newcommand{\simbolo}[1]{%
+  \raisebox{-0.42\height}{\begin{circuitikz}[scale=0.85,transform shape,font=\scriptsize]
+    \draw (0,0) node[left,azul]{A} to[#1] (2.2,0) node[right,azul]{K};
+  \end{circuitikz}}}
+\renewcommand{\arraystretch}{2.05}
+\begin{tabularx}{\linewidth}{@{}c l X c@{}}
+  \toprule
+  \textbf{Símbolo} & \textbf{Tipo} & \textbf{Funcionamiento y uso} & \textbf{Parámetro}\\
+  \midrule
+  \rowcolor{azulpalido}
+  \simbolo{D*} & Rectificador / señal & Unión pn de Si; rectificación, protección & $\Vg\approx\SI{0.6}{V}$\\
+  \rowcolor{azulpalido}
+  \simbolo{zD*} & Zener & Trabaja en ruptura inversa; referencia de tensión & $\VZ$\\
+  \rowcolor{azulpalido}
+  \simbolo{leD*} & LED & Emite luz en directa (flechas salientes) & $\Vg\simeq hc/e\lambda$\\
+  \simbolo{pD*} & Fotodiodo & Genera corriente al absorber luz (flechas entrantes) & $I_{\text{luz}}$\\
+  \simbolo{sD*} & Schottky & Unión metal--semiconductor; rápido & $\Vg\approx\SI{0.3}{V}$\\
+  \simbolo{VC*} & Varicap & Capacidad dependiente de la tensión inversa & $C(\VD)$\\
+  \bottomrule
+\end{tabularx}

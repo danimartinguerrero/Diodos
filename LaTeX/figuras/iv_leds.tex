@@ -1,0 +1,19 @@
+% Características I-V de los siete LED
+\begin{tikzpicture}
+\begin{axis}[width=\linewidth,height=8.2cm,
+  xmin=-1.2,xmax=3.4,ymin=-0.25,ymax=4.1,
+  xlabel={$\VD$ (V)},ylabel={$\ID$ (mA)},grid=major,
+  legend pos=north west,legend cell align=left,legend columns=1]
+  \foreach \col/\fic/\n in {cIR/ir/IR\ (940\,nm),cRojo/rojo/Rojo\ (630\,nm),
+      cAmarillo/amarillo/Amarillo\ (590\,nm),cVerde/verde/Verde\ (525\,nm),
+      cAzul/azul/Azul\ (470\,nm),cBlanco/blanco/Blanco,cUV/uv/UV\ (400\,nm)}{
+    \edef\temp{\noexpand\addplot[\col,mark=*,mark size=1.2pt,only marks]
+      table[x=VD,y=ID]{datos/iv_\fic.dat};
+      \noexpand\addlegendentry{\n}
+      \noexpand\addplot[\col,dashed,forget plot] table[x=VD,y=ID]{datos/fit_\fic.dat};}
+    \temp}
+  \draw[black!50] (axis cs:-1.2,0) -- (axis cs:3.4,0);
+  \draw[-{Stealth[length=6pt]},navy,thick] (axis cs:1.2,3.75) -- (axis cs:2.85,3.75)
+    node[midway,above,font=\scriptsize]{$\lambda$ decreciente $\Rightarrow$ $\Vg$ creciente};
+\end{axis}
+\end{tikzpicture}

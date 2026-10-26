@@ -1,0 +1,16 @@
+\begin{tikzpicture}
+\begin{axis}[width=7.4cm,height=6cm,ymode=log,
+  xmin=0.3,xmax=0.75,ymin=3e-3,ymax=10,
+  xlabel={$\VD$ (V)},ylabel={$\ID$ (mA)},grid=major,
+  legend pos=north west,
+  yticklabel style={/pgf/number format/fixed}]
+  \addplot[azulmed,thick] table[x=VD,y=ID]{datos/semilog_fit.dat};
+  \addlegendentry{Shockley, $n=\nshockley$}
+  \addplot[medida,cPN] table[x=VD,y=ID]{datos/semilog_pn.dat};
+  \addlegendentry{datos}
+  \node[font=\scriptsize,azul,rotate=38,anchor=south] at (axis cs:0.45,0.06)
+    {pendiente $1/(n\VT)$};
+  \node[font=\scriptsize,grisazul,align=center,anchor=north] at (axis cs:0.66,0.9)
+    {caída en\\[-2pt]$\Rs$};
+\end{axis}
+\end{tikzpicture}

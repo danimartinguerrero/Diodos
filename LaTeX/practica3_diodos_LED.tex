@@ -1,0 +1,956 @@
+% =====================================================================
+%  Práctica 3 · Identificación y caracterización de diodos LED
+%  Instrumentación Electrónica · Grado en Física · USAL · 2026/2027
+%  Compilar:  latexmk -pdf practica3_diodos_LED.tex
+%  (los datos ilustrativos se regeneran con scripts/generar_datos.py)
+% =====================================================================
+\documentclass[11pt,a4paper]{article}
+\usepackage{estilo}
+\input{datos/ajuste_umbral.tex}
+\CatchFileDef{\tablaumbral}{datos/tabla_umbral.tex}{}
+
+\begin{document}
+
+% =====================================================================
+%                              PORTADA
+% =====================================================================
+\thispagestyle{empty}
+\noindent\begin{tikzpicture}[remember picture,overlay]
+  \shade[top color=azulclaro!70,bottom color=white]
+    ($(current page.north west)+(0,-0.35)$) rectangle
+    ($(current page.north east)+(0,-6.5)$);
+  \shade[left color=navy,right color=azulmed!45,middle color=azul!85]
+    (current page.north west) rectangle ($(current page.north east)+(0,-0.35)$);
+  \shade[left color=navy,right color=azulmed!45,middle color=azul!85]
+    (current page.south west) rectangle ($(current page.south east)+(0,0.35)$);
+\end{tikzpicture}\par
+\vspace*{-0.9cm}
+\noindent
+\begin{tabularx}{\linewidth}{@{}l>{\centering\arraybackslash}Xr@{}}
+  \raisebox{-.5\height}{\includegraphics[height=1.0cm]{img/logo-usal.png}} &
+  \begin{tabular}{@{}c@{}}
+    {\color{navy}\large\textls[120]{\textsc{Universidad de Salamanca}}}\\[2pt]
+    {\color{grisazul}\small\textls[100]{\textsc{Facultad de Ciencias\ \ $\cdot$\ \ Grado en Física}}}
+  \end{tabular} &
+  \raisebox{-.5\height}{\includegraphics[height=0.95cm]{img/logo-ciencias.png}}
+\end{tabularx}
+\par\vspace{6pt}
+\noindent{\color{grisclaro}\rule{\linewidth}{.6pt}}
+\vspace{0.7cm}
+
+\noindent{\color{azul}\large\textls[150]{\textsc{Instrumentación Electrónica\ \ $\cdot$\ \ Práctica 3}}}
+\par\vspace{0.35cm}
+\noindent{\fontsize{30}{37}\selectfont\bfseries\color{navy}Identificación y
+caracterización\\[2pt] de diodos LED\par}
+\vspace{6pt}
+\noindent\tikz\shade[left color=navy,right color=white,middle color=azul]
+  (0,0) rectangle (0.5\linewidth,2.6pt);
+\par\vspace{0.45cm}
+\noindent{\large\itshape\color{black!80}
+Unión pn, ecuación de Shockley y tensión umbral; diodo rectificador, diodo
+Zener y LED de siete colores; montaje con el DAQ, instrumento virtual en
+LabVIEW y lectura de la característica $\ID(\VD)$\par}
+\vspace{0.6cm}
+
+\noindent
+\begin{minipage}[t]{0.5\linewidth}
+  {\color{azul}\small\textls[120]{\textsc{Autor}}}\\[2pt]
+  {\large Daniel Martín Guerrero\,\textsuperscript{a}}
+\end{minipage}%
+\begin{minipage}[t]{0.5\linewidth}
+  {\color{azul}\small\textls[120]{\textsc{Asignatura}}}\\[2pt]
+  {\large Instrumentación Electrónica\,\textsuperscript{a}}
+\end{minipage}
+\par\vspace{5pt}
+\noindent{\small\color{grisazul}\textsuperscript{a}\,Grado en Física, Facultad de
+Ciencias, Universidad de Salamanca, Plaza de la Merced s/n, 37008 Salamanca,
+España\par}
+\vspace{0.55cm}
+
+\noindent
+\begin{tcolorbox}[enhanced,sharp corners,boxrule=0pt,frame hidden,
+  borderline west={2.2pt}{0pt}{navy},
+  interior style={left color=azulclaro,right color=white},
+  left=9pt,right=6pt,top=6pt,bottom=6pt,width=\linewidth]
+\begin{minipage}[t]{0.585\linewidth}
+  {\color{navy}\textls[120]{\textsc{Resumen}}}\par\vspace{4pt}
+  \small\setlength{\parindent}{0pt}\linespread{1.12}\selectfont
+  Esta guía prepara la práctica de caracterización de diodos con el sistema
+  de adquisición (DAQ). Repasamos la física de la unión pn y de la emisión
+  de luz en un LED, la simbología y cómo identificar ánodo y cátodo, y
+  detallamos el circuito $R$--diodo que hay que montar, las conexiones
+  AO-0/AI-1/GND y la configuración del instrumento virtual en LabVIEW. Se
+  explica qué aparecerá en la gráfica $XY$ (la «oscilograma» $\ID$ frente a
+  $\VD$) para cada componente y cómo extraer de ella la tensión umbral
+  $\Vg$, la tensión Zener $\VZ$ y la relación $e\Vg\simeq hc/\lambda$ entre
+  el color del LED y su umbral.
+\end{minipage}\hfill
+\begin{minipage}[t]{0.38\linewidth}\centering\vspace{2pt}
+  \input{figuras/portada_iv.tex}\\[1pt]
+  \parbox{0.95\linewidth}{\centering\scriptsize\color{grisazul}
+  Característica $\ID(\VD)$ de LED de distintos colores: el umbral crece
+  al disminuir la longitud de onda.}
+\end{minipage}
+\end{tcolorbox}
+\vspace{0.25cm}
+
+\noindent{\color{azul}\textls[120]{\textsc{Palabras clave}}}\ \
+unión pn $\cdot$ ecuación de Shockley $\cdot$ tensión umbral $\cdot$ diodo
+Zener $\cdot$ LED $\cdot$ banda prohibida $\cdot$ recta de carga $\cdot$ DAQ
+$\cdot$ LabVIEW $\cdot$ característica $I$--$V$
+\par\vspace{5pt}
+\noindent{\color{azul}\textls[120]{\textsc{Clasificación PACS}}}\ \ 85.30.Kk
+(diodos de unión); 85.60.Jb (dispositivos emisores de luz); 07.05.Hd
+(adquisición de datos)
+\par\vspace{7pt}{\color{grisclaro}\hrule height .5pt}\vspace{9pt}
+\noindent\hfill
+$\ID=\IS\bigl(e^{\VD/n\VT}-1\bigr)$\hfill
+$\ID=\dfrac{\Vin-\VD}{R}$\hfill
+$e\Vg\simeq\Eg\simeq\dfrac{hc}{\lambda}$\hfill
+$\Vg[\si{V}]\simeq\dfrac{1240}{\lambda[\si{nm}]}$\hfill\null
+\par\vspace{9pt}{\color{grisclaro}\hrule height .5pt}
+
+\vfill
+\begin{center}
+  {\color{navy}\large\textls[150]{\textsc{Guía de laboratorio con fundamentos teóricos}}}\\[6pt]
+  {\color{grisazul}\textls[120]{\textsc{Salamanca, curso 2026/2027}}}
+\end{center}
+\vspace*{0.2cm}
+\newpage
+
+% =====================================================================
+\pagestyle{plain}
+\renewcommand{\contentsname}{Índice}
+{\hypersetup{linkcolor=black}\tableofcontents}
+\newpage
+\pagestyle{fancy}
+
+% =====================================================================
+\section{Introducción: qué vamos a hacer y por qué}
+% =====================================================================
+
+El diodo es el elemento no lineal más sencillo de la electrónica: deja pasar
+la corriente en un sentido y la bloquea en el otro. Esa asimetría nace de la
+física de la \emph{unión pn}, y en un tipo particular de diodo, el \emph{LED}
+(\emph{light-emitting diode}), la energía que liberan los portadores al
+recombinarse sale en forma de luz cuyo color está fijado por el material. En
+esta práctica construiremos un pequeño \emph{trazador de curvas}: un
+instrumento virtual que barre la tensión aplicada a un circuito, mide la
+respuesta y dibuja la característica corriente--tensión $\ID(\VD)$ de cada
+diodo~\cite{guion}.
+
+Seguimos la estructura del guion de la práctica~\cite{guion}; la teoría de
+semiconductores puede ampliarse en~\cite{sze,pierret}, la física de los LED
+en~\cite{schubert} y los aspectos de circuito en~\cite{horowitz,sedra}.
+
+\subsection{Objetivos}
+
+\begin{enumerate}
+  \item Caracterizar un \textbf{diodo pn} de silicio, un \textbf{diodo Zener}
+        y \textbf{LED} de siete tipos: infrarrojo (IR), rojo, amarillo,
+        verde, azul, blanco y ultravioleta (UV).
+  \item Montar en la protoboard el circuito $R$--diodo y conectarlo al DAQ:
+        la salida analógica \textbf{AO-0} impone $\Vin$ y la entrada
+        analógica \textbf{AI-1} mide $\VD$.
+  \item Programar en LabVIEW el barrido de $\Vin$, el cálculo de
+        $\ID=(\Vin-\VD)/R$, la representación $XY$ y el guardado de los datos.
+  \item Extraer la \textbf{tensión umbral} $\Vg$ de cada diodo, la
+        \textbf{tensión Zener} $\VZ$ y explicar la dependencia de $\Vg$ con
+        el color (longitud de onda) del LED.
+\end{enumerate}
+
+\Cref{fig:esquema-general} resume la cadena de medida y la
+\cref{tab:magnitudes} lo que se impone, lo que se mide y lo que se calcula.
+
+\begin{figure}[htbp]
+  \centering
+  \input{figuras/esquema_general.tex}
+  \caption{Cadena de medida de la práctica. El programa de LabVIEW genera una
+  rampa de $N$ valores de $\Vin$ entre $V_{\text{start}}$ y $V_{\text{end}}$; en
+  cada iteración el DAQ la impone en AO-0, espera, lee $\VD$ en AI-1, y el
+  programa calcula $\ID$ por la ley de Ohm, añade el punto $(\VD,\ID)$ a la
+  gráfica $XY$ y, al terminar, guarda todo en un fichero de texto.}
+  \label{fig:esquema-general}
+\end{figure}
+
+\begin{table}[htbp]
+  \centering\small
+  \caption{Magnitudes de la práctica: qué fija el usuario, qué impone y mide
+  el DAQ y qué se calcula.}
+  \label{tab:magnitudes}
+  \renewcommand{\arraystretch}{1.25}
+  \begin{tabularx}{\linewidth}{@{}l l X l@{}}
+    \toprule
+    \textbf{Magnitud} & \textbf{Papel} & \textbf{Cómo se obtiene} & \textbf{Valor típico}\\
+    \midrule
+    $V_{\text{start}},\,V_{\text{end}}$ & control & Panel frontal (rango de la rampa) & $-5$ y $+5$\,V\\
+    $N$ (\# muestras) & control & Panel frontal & $100$--$200$\\
+    $R$ & control & Panel frontal (valor nominal, en k$\Omega$) & $1$\,k$\Omega$\\
+    \rowcolor{azulpalido}
+    $\Vin$ & impuesta & AO-0 del DAQ, un valor por iteración & $[-5,\,5]$\,V\\
+    \rowcolor{azulpalido}
+    $\VD$ & medida & AI-1 del DAQ (tensión ánodo--cátodo) & $[-5,\,3{,}3]$\,V\\
+    $\ID$ & calculada & $\ID=(\Vin-\VD)/R$ & $[-5,\,4{,}5]$\,mA\\
+    $\Vg,\ \VZ$ & resultado & Análisis de la curva $\ID(\VD)$ (\cref{sec:analisis}) & según diodo\\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+% =====================================================================
+\section{Fundamentos: la unión pn}
+\label{sec:fundamentos}
+% =====================================================================
+
+\subsection{Semiconductores, bandas y dopado}
+
+En un sólido cristalino los niveles de energía de los electrones se agrupan
+en bandas. En un semiconductor la \emph{banda de valencia} (BV), llena a
+$T=0$, y la \emph{banda de conducción} (BC), vacía, están separadas por una
+\emph{banda prohibida} de anchura $\Eg$ de aproximadamente \SIrange{1}{3.5}{eV}.
+
+\begin{definicion}{Banda prohibida y portadores}{gap}
+  La \emph{energía de la banda prohibida} (\emph{gap}) es
+  $\Eg=E_c-E_v$, diferencia entre el mínimo de la BC y el máximo de la BV.
+  Los portadores de carga son los \emph{electrones} de la BC (carga $-e$) y
+  los \emph{huecos} de la BV (estados vacíos que se comportan como cargas
+  $+e$).
+\end{definicion}
+
+Añadiendo impurezas (\emph{dopado}) se controla qué portador domina: con
+donadores (P, As en Si) se obtiene un semiconductor \textbf{tipo n}, con
+mayoría de electrones; con aceptores (B, Al) uno \textbf{tipo p}, con
+mayoría de huecos. Valores representativos: $\Eg(\text{Si})=\SI{1.12}{eV}$,
+$\Eg(\text{GaAs})=\SI{1.42}{eV}$, $\Eg(\text{GaN})=\SI{3.4}{eV}$~\cite{sze}.
+
+\subsection{La unión pn en equilibrio}
+
+Al poner en contacto una región p y una n, los electrones difunden hacia p y
+los huecos hacia n, donde se recombinan. Junto a la unión quedan los iones
+fijos sin compensar: aparece una \emph{zona de carga espacial} (o \emph{de
+deplexión}), sin portadores libres, con un campo eléctrico $\vec E$ dirigido
+de n a p que frena la difusión (\cref{fig:union}). En equilibrio la difusión
+y el arrastre se compensan y se establece una barrera de potencial
+$V_{\text{bi}}$ (\emph{built-in}), del orden de $\Eg/e$.
+
+\begin{figure}[htbp]
+  \centering
+  \input{figuras/union_pn.tex}
+  \caption{(a) Unión pn en equilibrio: la difusión de portadores deja una zona
+  de carga espacial de anchura $W$ con iones aceptores ($\ominus$) en el lado p
+  e iones donadores ($\oplus$) en el lado n, que crean un campo $\vec E$ de n
+  a p. (b) Diagrama de bandas: el nivel de Fermi $E_F$ es constante y las
+  bandas se curvan en la zona de carga espacial formando la barrera
+  $eV_{\text{bi}}$.}
+  \label{fig:union}
+\end{figure}
+
+\subsection{Polarización directa e inversa}
+
+Aplicar una tensión $\VD$ entre ánodo (p) y cátodo (n) modifica la barrera
+(\cref{fig:bandas}):
+\begin{itemize}
+  \item \textbf{Directa} ($\VD>0$): la barrera baja a $e(V_{\text{bi}}-\VD)$;
+    una fracción exponencialmente creciente de portadores la supera, se
+    \emph{inyecta} en la región opuesta y se recombina. La corriente crece
+    exponencialmente.
+  \item \textbf{Inversa} ($\VD<0$): la barrera sube a
+    $e(V_{\text{bi}}+|\VD|)$ y la zona de carga espacial se ensancha. Solo
+    circula la diminuta corriente de saturación $-\IS$ (pA--nA), debida a los
+    portadores minoritarios.
+\end{itemize}
+
+\begin{figure}[htbp]
+  \centering
+  \input{figuras/bandas.tex}
+  \caption{Diagramas de bandas de la unión pn. (a) Equilibrio: $E_F$ único.
+  (b) Polarización directa: la barrera se reduce, los cuasi-niveles de Fermi
+  $E_{Fn}$ y $E_{Fp}$ se separan $e\VD$ y los electrones inyectados se
+  recombinan con huecos; en un semiconductor de gap directo la energía sale
+  como un fotón $h\nu\simeq\Eg$. (c) Polarización inversa: la barrera crece y
+  la corriente es despreciable.}
+  \label{fig:bandas}
+\end{figure}
+
+\subsection{Ecuación de Shockley y tensión umbral}
+
+\begin{proposicion}{Ecuación del diodo de Shockley~\cite{shockley}}{shockley}
+  La corriente de un diodo de unión ideal en función de la tensión aplicada es
+  \begin{destacada}
+    \ID=\IS\left(e^{\VD/n\VT}-1\right),\qquad \VT=\frac{k_BT}{e}\simeq\SI{25.9}{mV}\ (T=\SI{300}{K}),
+    \label{eq:shockley}
+  \end{destacada}
+  donde $\IS$ es la corriente de saturación inversa y $n\in[1,2]$ el
+  \emph{factor de idealidad}.
+\end{proposicion}
+
+En directa, en cuanto $\VD\gg n\VT$, la exponencial domina:
+$\ln\ID\simeq\ln\IS+\VD/n\VT$, una recta en escala semilogarítmica
+(\cref{fig:semilog}) de cuya pendiente se obtiene $n$. Por cada década de
+corriente la tensión solo aumenta $n\VT\ln10\approx\SIrange{60}{120}{mV}$:
+vista en escala lineal, la curva parece «apagada» hasta cierta tensión y
+luego casi vertical. Ese codo define el parámetro práctico más importante.
+
+\begin{definicion}{Tensión umbral}{umbral}
+  La \emph{tensión umbral} (de codo o de encendido) $\Vg$ es la tensión a
+  partir de la cual el diodo conduce de forma apreciable. Operativamente, en
+  esta práctica la definimos como la intersección con el eje $\ID=0$ de la
+  recta que ajusta el tramo de alta corriente de la característica
+  $\ID(\VD)$ (\cref{fig:metodo-umbral}).
+\end{definicion}
+
+\begin{observacion}[Valores típicos]
+  $\Vg\approx\SIrange{0.6}{0.7}{V}$ para un diodo de silicio,
+  $\approx\SI{0.3}{V}$ para uno de germanio o Schottky, y entre
+  $\approx\SI{1.1}{V}$ (LED IR) y $\approx\SI{3}{V}$ (LED UV) para los LED. Que
+  $\Vg$ no es un valor «exacto» se ve en~\eqref{eq:shockley}: depende del rango
+  de corriente usado para definir el codo y de la temperatura
+  ($\mathrm d\Vg/\mathrm dT\approx\SI{-2}{mV/K}$).
+\end{observacion}
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[b]{0.49\linewidth}\centering
+    \input{figuras/semilog.tex}
+    \caption{Escala semilogarítmica.}
+    \label{fig:semilog}
+  \end{subfigure}\hfill
+  \begin{subfigure}[b]{0.49\linewidth}\centering
+    \input{figuras/metodo_umbral.tex}
+    \caption{Escala lineal y método del umbral.}
+    \label{fig:metodo-umbral}
+  \end{subfigure}
+  \caption{Característica directa del diodo pn (datos simulados con el
+  circuito de la práctica). (a) En escala semilogarítmica el tramo
+  exponencial es una recta; el ajuste de Shockley da $n\simeq\num{\nshockley}$ e
+  $\IS\simeq\SI{\isshockley}{nA}$. A corrientes altas la caída en la
+  resistencia serie curva los datos hacia abajo. (b) En escala lineal, la recta
+  que ajusta el tramo de alta corriente corta el eje en
+  $\Vg\simeq\SI{\umbralpn}{V}$.}
+  \label{fig:shockley}
+\end{figure}
+
+\subsection{Modelos lineales por tramos}
+
+Para analizar circuitos se sustituye~\eqref{eq:shockley} por modelos más
+sencillos (\cref{fig:modelos}): el \emph{diodo ideal} (cortocircuito en
+directa, circuito abierto en inversa), el modelo de \emph{tensión umbral}
+(fuente $\Vg$ en directa) y el de \emph{umbral más resistencia dinámica}
+$r_d=\mathrm d\VD/\mathrm d\ID\simeq n\VT/\ID$. Con $\ID\sim\SI{3}{mA}$,
+$r_d\sim\SI{15}{\ohm}$, despreciable frente a $R=\SI{1}{k\ohm}$.
+
+\begin{figure}[htbp]
+  \centering
+  \input{figuras/modelos.tex}
+  \caption{Modelos del diodo: (a) ideal, (b) tensión umbral constante,
+  (c) umbral más resistencia dinámica $r_d$. En gris, la característica real.}
+  \label{fig:modelos}
+\end{figure}
+
+\subsection{Ruptura inversa: el diodo Zener}
+
+Si la polarización inversa supera cierto valor, la corriente inversa crece
+bruscamente: es la \emph{ruptura}. En diodos muy dopados el campo en la zona
+de carga espacial es tan intenso que los electrones atraviesan la banda
+prohibida por \emph{efecto túnel} (efecto Zener, $\VZ\lesssim\SI{5}{V}$); en
+diodos menos dopados domina la \emph{multiplicación por avalancha}
+($\VZ\gtrsim\SI{7}{V}$)~\cite{sze}. Un diodo normal no debe trabajar en
+ruptura, pero el \textbf{diodo Zener} se fabrica para hacerlo de forma
+controlada y reversible.
+
+\begin{definicion}{Tensión Zener}{zener}
+  La \emph{tensión Zener} $\VZ$ es el valor absoluto de la tensión inversa a
+  la que el diodo entra en ruptura; en esa región $\VD\simeq-\VZ$
+  prácticamente con independencia de la corriente. Por eso el Zener se usa
+  como \emph{referencia} o \emph{regulador} de tensión.
+\end{definicion}
+
+\begin{observacion}[Rango del DAQ]
+  El DAQ genera como mucho $|\Vin|=\SI{5}{V}$, y con $R=\SI{1}{k\ohm}$ la
+  corriente inversa es $(|\Vin|-\VZ)/R$. Solo veremos la ruptura si
+  $\VZ<\SI{5}{V}$ (por ejemplo, un Zener de \SI{3.3}{V} o \SI{4.7}{V}); para
+  $\VZ$ mayores la rama inversa del Zener será idéntica a la de un diodo
+  normal.
+\end{observacion}
+
+% =====================================================================
+\section{Clases de diodos y simbología}
+\label{sec:simbologia}
+% =====================================================================
+
+\subsection{Símbolos}
+
+Todos los símbolos de diodo comparten un triángulo, que apunta en el
+\emph{sentido convencional de la corriente directa}, y una barra, que
+representa el \textbf{cátodo} (K, terminal $-$). El ánodo (A, terminal $+$)
+está en la base del triángulo. Las variantes modifican la barra o añaden
+flechas (\cref{tab:simbolos}).
+
+\begin{table}[htbp]
+  \centering\small
+  \caption{Símbolos normalizados de los diodos más comunes. En todos, la
+  corriente directa entra por el ánodo A y sale por el cátodo K. En esta
+  práctica se usan los tres primeros.}
+  \label{tab:simbolos}
+  \input{figuras/tabla_simbolos.tex}
+\end{table}
+
+\subsection{Identificación física de ánodo y cátodo}
+
+En el laboratorio no hay símbolos, sino componentes. La
+\cref{fig:encapsulados} muestra cómo reconocer la polaridad en los
+encapsulados que vamos a usar.
+
+\begin{figure}[htbp]
+  \centering
+  \input{figuras/encapsulados.tex}
+  \caption{Encapsulados de la práctica. (a) Diodo rectificador en encapsulado
+  axial de plástico (p.\,ej.\ 1N4007): la \emph{banda} marca el cátodo. (b)
+  Diodo de señal o Zener en vidrio (p.\,ej.\ 1N4148, BZX55): de nuevo la
+  banda negra es el cátodo. (c) Anatomía de un LED de \SI{5}{mm}: el chip
+  semiconductor descansa en la copa reflectora del \emph{yunque} (cátodo) y un
+  hilo de oro lo une al \emph{poste} (ánodo); la patilla larga es el ánodo y
+  el borde plano de la base señala el cátodo. (d) Vista superior y símbolo.}
+  \label{fig:encapsulados}
+\end{figure}
+
+\begin{laboratorio}{Cómo identificar la polaridad}{polaridad}
+  \begin{itemize}[leftmargin=1.2em]
+    \item \textbf{Diodos axiales:} la banda (blanca, gris o negra) está en el
+      lado del \textbf{cátodo}, igual que la barra del símbolo.
+    \item \textbf{LED:} la \textbf{patilla larga es el ánodo} ($+$); la corta
+      y el \textbf{borde plano} de la base indican el cátodo ($-$). Si las
+      patillas se han cortado, el electrodo interior más grande (yunque)
+      suele ser el cátodo, aunque no es universal.
+    \item \textbf{Comprobación:} el modo «diodo» del multímetro
+      (\raisebox{-1pt}{\tikz[scale=.3]{\draw[fill=black](0,0)--(0,.6)--(.6,.3)--cycle;\draw[thick](.6,0)--(.6,.6);}})
+      marca $\approx\SI{0.6}{V}$ con la punta roja en el ánodo de un diodo de
+      Si y enciende débilmente la mayoría de LED; en inversa marca «OL».
+  \end{itemize}
+\end{laboratorio}
+
+% =====================================================================
+\section{El LED: de la unión pn a la luz}
+\label{sec:led}
+% =====================================================================
+
+\subsection{Recombinación radiativa}
+
+Cuando en polarización directa un electrón de la BC se recombina con un hueco
+de la BV, libera una energía $\approx\Eg$. En el silicio, de \emph{gap
+indirecto}, la conservación del momento exige la participación de un fonón y
+la energía acaba casi toda como calor. En semiconductores de \emph{gap
+directo} (GaAs, AlGaInP, InGaN\ldots) la recombinación es mayoritariamente
+\emph{radiativa}: se emite un fotón (\cref{fig:bandas}b).
+
+\begin{proposicion}{Color y tensión umbral}{color}
+  La energía de los fotones emitidos es $h\nu\simeq\Eg$, luego la longitud de
+  onda del pico de emisión es
+  \begin{destacada}
+    \lambda\simeq\frac{hc}{\Eg},\qquad
+    \lambda[\si{nm}]\simeq\frac{1240}{\Eg[\si{eV}]}.
+    \label{eq:lambda}
+  \end{destacada}
+  Como para que circule corriente apreciable hay que reducir la barrera, que es
+  del orden de $\Eg/e$, la tensión umbral cumple
+  \begin{destacada}
+    e\Vg\simeq\Eg\simeq\frac{hc}{\lambda}
+    \quad\Longrightarrow\quad
+    \Vg[\si{V}]\simeq\frac{1240}{\lambda[\si{nm}]}.
+    \label{eq:umbral-lambda}
+  \end{destacada}
+\end{proposicion}
+
+Así, \textbf{cuanto menor es la longitud de onda (más hacia el azul y el
+violeta), mayor es la tensión umbral}: el LED IR enciende a $\approx\SI{1.1}{V}$
+y el UV a $\approx\SI{3}{V}$. Es el resultado central que debéis explicar en
+el informe y permite incluso \emph{estimar la constante de Planck}
+(\cref{sec:planck}).
+
+\subsection{Materiales y espectros}
+
+El color se elige con el material y su composición (\cref{tab:leds}): GaAs
+para el infrarrojo, AlGaInP para rojo--ámbar y InGaN para verde, azul y UV.
+El \textbf{LED blanco} no existe como tal: es un chip azul de InGaN cubierto
+de un \emph{fósforo} (YAG:Ce) que absorbe parte del azul y reemite en el
+amarillo; su umbral es, por tanto, el de un LED azul. Los espectros
+(\cref{fig:espectros}) son bandas de anchura \SIrange{15}{50}{nm}, no
+líneas.
+
+\begin{table}[htbp]
+  \centering\small
+  \caption{LED de la práctica: material típico, longitud de onda de pico,
+  energía del fotón $E_{\text{ph}}=hc/\lambda_p$ y rango orientativo de
+  $\Vg$. Los valores concretos dependen del fabricante: consultad la hoja de
+  características.}
+  \label{tab:leds}
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabular}{@{}l l c c c l@{}}
+    \toprule
+    \textbf{LED} & \textbf{Material} & $\lambda_p$ (nm) & $E_{\text{ph}}$ (eV)
+      & $\Vg$ esperado (V) & \textbf{Observaciones}\\
+    \midrule
+    {\color{cIR}\rule{1.4ex}{1.4ex}}\ IR       & GaAs        & 940 & 1,32 & 1,0--1,2 & invisible; se ve con la cámara del móvil\\
+    {\color{cRojo}\rule{1.4ex}{1.4ex}}\ Rojo     & AlGaInP     & 630 & 1,97 & 1,6--1,8 & \\
+    {\color{cAmarillo}\rule{1.4ex}{1.4ex}}\ Amarillo & AlGaInP     & 590 & 2,10 & 1,7--1,9 & \\
+    {\color{cVerde}\rule{1.4ex}{1.4ex}}\ Verde    & InGaN       & 525 & 2,36 & 2,3--2,6 & (GaP verde-amarillo: $\approx$1,9)\\
+    {\color{cAzul}\rule{1.4ex}{1.4ex}}\ Azul     & InGaN       & 470 & 2,64 & 2,5--2,8 & \\
+    {\color{cBlanco}\rule{1.4ex}{1.4ex}}\ Blanco   & InGaN + fósforo & 455 & 2,72 & 2,5--2,8 & chip azul\\
+    {\color{cUV}\rule{1.4ex}{1.4ex}}\ UV       & InGaN       & 400 & 3,10 & 2,8--3,1 & no mirar directamente\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \input{figuras/espectros.tex}
+  \caption{Espectros de emisión normalizados típicos de los LED de la práctica.
+  La barra inferior muestra el espectro visible (\SIrange{380}{750}{nm}). El
+  LED blanco combina el pico azul del chip con la banda ancha del fósforo.}
+  \label{fig:espectros}
+\end{figure}
+
+\begin{observacion}[Por qué $e\Vg$ no es exactamente $\Eg$]\label{obs:desv}
+  La relación~\eqref{eq:umbral-lambda} es aproximada: (i) la emisión se debe
+  también a portadores con energía térmica por encima de los bordes de banda,
+  (ii) los LED reales son heteroestructuras con capas de distinto gap, (iii)
+  la resistencia serie de contactos y capas añade una caída óhmica, y (iv) en
+  los LED de InGaN, sobre todo verdes, los campos de polarización y la
+  dispersión de composición desplazan el umbral. Aun así, la tendencia lineal
+  de $\Vg$ con $1/\lambda$ es muy clara (\cref{fig:planck}).
+\end{observacion}
+
+% =====================================================================
+\section{El circuito a montar}
+\label{sec:montaje}
+% =====================================================================
+
+\subsection{Esquema y ecuaciones}
+
+El circuito de caracterización (\cref{fig:circuito}) es un divisor formado por
+la resistencia $R$ y el diodo en serie. El DAQ impone $\Vin$ entre AO-0 y
+masa, y mide la tensión del nudo intermedio, que es la tensión del diodo
+$\VD$ (ánodo respecto de cátodo, conectado a masa).
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}[b]{0.43\linewidth}\centering
+    \input{figuras/circuito.tex}
+    \caption{Esquema eléctrico.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[b]{0.55\linewidth}\centering
+    \input{figuras/protoboard.tex}
+    \caption{Montaje en la protoboard.}
+    \label{fig:protoboard}
+  \end{subfigure}
+  \caption{(a) Circuito de caracterización: AO-0 impone $\Vin$, AI-1 mide
+  $\VD$ y la corriente se deduce de la caída en $R$. (b) Montaje con un LED:
+  cada columna de cinco orificios está conectada internamente; la resistencia
+  de \SI{1}{k\ohm} (marrón--negro--rojo--oro) une la columna de AO-0 con la
+  del ánodo, donde se conecta también AI-1, y el cátodo va a GND.}
+  \label{fig:circuito}
+\end{figure}
+
+\begin{proposicion}{Corriente del diodo}{corriente}
+  Como la entrada AI-1 tiene una impedancia muy alta y no absorbe corriente,
+  la misma $\ID$ atraviesa $R$ y el diodo; por la ley de Ohm,
+  \begin{destacada}
+    \ID\,(\si{mA})=\frac{\Vin-\VD}{R}\qquad\bigl([R]=\si{k\ohm}\bigr).
+    \label{eq:ohm}
+  \end{destacada}
+\end{proposicion}
+
+\subsection{Punto de trabajo y recta de carga}
+
+Para cada $\Vin$ el circuito se sitúa en la intersección de la característica
+del diodo con la \emph{recta de carga} $\ID=(\Vin-\VD)/R$, de pendiente
+$-1/R$, que corta los ejes en $\VD=\Vin$ e $\ID=\Vin/R$ (\cref{fig:recta}).
+Al barrer $\Vin$ la recta se desplaza paralelamente y el punto de trabajo
+recorre la característica: \emph{eso es exactamente lo que hace nuestro
+instrumento}.
+
+\begin{figure}[htbp]
+  \centering
+  \input{figuras/recta_carga.tex}
+  \caption{Rectas de carga del circuito con $R=\SI{1}{k\ohm}$ para
+  $\Vin=2,3,4,5$\,V y característica de un LED rojo. Los puntos de trabajo
+  ($\bullet$) se acumulan en la rama casi vertical: por encima del umbral un
+  aumento de $\Vin$ se traduce en corriente, no en tensión del diodo. La
+  corriente máxima es $I_{\max}\simeq(\SI{5}{V}-\Vg)/R$.}
+  \label{fig:recta}
+\end{figure}
+
+\begin{observacion}[Papel de $R$]
+  $R$ \emph{limita la corriente}: sin ella, el DAQ aplicaría directamente
+  $\SI{5}{V}$ a un LED de umbral $\SI{2}{V}$ y la corriente, exponencial,
+  quedaría limitada solo por la salida del DAQ, dañando el LED o la propia
+  salida. Con $R=\SI{1}{k\ohm}$, $\ID\le\SI{5}{mA}$, muy por debajo del
+  máximo típico de un LED (\SI{20}{mA}), y la potencia en $R$ es como mucho
+  $V^2/R=\SI{25}{mW}$.
+\end{observacion}
+
+\subsection{Conexiones con el DAQ}
+
+\begin{table}[htbp]
+  \centering\small
+  \caption{Conexiones del circuito con los dos sistemas de adquisición del
+  laboratorio~\cite{guion,mydaq}.}
+  \label{tab:conexiones}
+  \renewcommand{\arraystretch}{1.25}
+  \begin{tabularx}{\linewidth}{@{}l X X@{}}
+    \toprule
+    \textbf{Punto del circuito} & \textbf{DAQ Signal Accessory} & \textbf{NI myDAQ}\\
+    \midrule
+    Extremo libre de $R$ & AO-0 (salida analógica 0) & AO-0\\
+    Nudo $R$--ánodo & AI-1 (entrada analógica 1) & AI-1\,$+$\\
+    Cátodo (masa del circuito) & GND del DAQ & AGND \emph{y} AI-1\,$-$\\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\begin{precaucion}{Antes de ejecutar}{antes}
+  \begin{itemize}[leftmargin=1.2em]
+    \item Nunca conectéis un diodo o LED directamente entre AO-0 y GND sin la
+      resistencia $R$.
+    \item Unid siempre la masa del circuito con la del DAQ; en el myDAQ la
+      entrada AI-1 es diferencial y su borne $-$ debe ir también a masa, o la
+      lectura de $\VD$ «flotará».
+    \item Comprobad la polaridad: un LED montado al revés da una curva
+      especular (conduce para $\VD<0$\ldots\ que nunca alcanza) y no se ilumina.
+    \item No miréis directamente el LED UV encendido ni a corta distancia.
+  \end{itemize}
+\end{precaucion}
+
+% =====================================================================
+\section{El instrumento virtual en LabVIEW}
+\label{sec:labview}
+% =====================================================================
+
+\subsection{Panel frontal}
+
+El panel frontal (\cref{fig:panel}) contiene cuatro controles numéricos y un
+indicador gráfico de tipo \ttt{Express XY Graph}
+(\ruta{Modern\,$\to$\,Graph\,$\to$\,Express XY Graph}), además de la imagen
+del circuito (\ttt{LED\_cir.png}, disponible en Studium).
+
+\begin{figure}[htbp]
+  \centering
+  \input{figuras/panel_frontal.tex}
+  \caption{Esquema del panel frontal del instrumento virtual: controles de la
+  rampa ($V_{\text{start}}$, $V_{\text{end}}$, \# muestras), valor de $R$,
+  ruta del fichero, imagen del circuito y gráfica $XY$ con $\ID$ (mA, formato
+  científico) frente a $\VD$ (V). La curva mostrada corresponde a un LED rojo.}
+  \label{fig:panel}
+\end{figure}
+
+\subsection{Diagrama de bloques}
+
+\Cref{fig:bloques} resume la lógica del programa. Los puntos que hay que
+configurar con cuidado son:
+
+\begin{enumerate}
+  \item \textbf{Rampa.} \ttt{Ramp Pattern} genera un vector de \# muestras
+    valores equiespaciados entre $V_{\text{start}}$ y $V_{\text{end}}$. El
+    vector entra en el bucle \ttt{For} con \emph{auto-indexado}: en cada
+    iteración se toma un valor de $\Vin$ y el bucle se repite tantas veces
+    como elementos.
+  \item \textbf{Temporización.} \ttt{Wait Until Next ms Multiple} con
+    \SI{100}{ms} fija el ritmo: una medida cada \SI{0.1}{s} (un barrido de
+    100 puntos dura \SI{\approx10}{s}) y da tiempo a que el circuito se
+    estabilice.
+  \item \textbf{DAQ Assistant de salida (AO-0).}
+    \ruta{Generate Signals\,$\to$\,Analog Output\,$\to$\,Voltage\,$\to$\,ao0},
+    rango $V_{\min}=\SI{-5}{V}$, $V_{\max}=\SI{5}{V}$, temporización
+    \ttt{1 Sample (On Demand)}.
+  \item \textbf{DAQ Assistant de entrada (AI-1).}
+    \ruta{Acquire Signals\,$\to$\,Analog Input\,$\to$\,Voltage\,$\to$\,ai1},
+    rango $\pm\SI{5}{V}$, \ttt{1 Sample (On Demand)}: una lectura de $\VD$ por
+    iteración, \emph{después} de escribir $\Vin$.
+  \item \textbf{Corriente.} Con funciones aritméticas,
+    $\ID\,(\si{mA})=(\Vin-\VD)/R$ con $R$ en k$\Omega$, ec.~\eqref{eq:ohm}.
+  \item \textbf{Gráfica.} \ttt{Build XY Graph} con $X=\VD$ e $Y=\ID$;
+    desactivad \ttt{Clear data on each call} (doble clic) para que los puntos
+    se acumulen, y poned el eje $Y$ en formato científico.
+  \item \textbf{Línea de errores.} Encadenad el \emph{error cluster} entre
+    los DAQ Assistant: fuerza el orden \emph{escribir}\,$\to$\,\emph{leer} y
+    detiene la ejecución si algo falla.
+  \item \textbf{Reinicio.} Tras el bucle, un tercer DAQ Assistant (copia del
+    de AO-0) escribe \SI{0}{V}, para no dejar el diodo polarizado.
+  \item \textbf{Guardado.} \ruta{Programming\,$\to$\,File I/O\,$\to$\,Write
+    to Spreadsheet File} con formato \ttt{\%.4e}, la opción
+    \ttt{transpose} activada (datos en columnas) y un control de ruta de
+    fichero. Guardad al menos las columnas $\Vin$, $\VD$, $\ID$.
+\end{enumerate}
+
+\begin{figure}[htbp]
+  \centering
+  \input{figuras/diagrama_bloques.tex}
+  \caption{Diagrama de bloques simplificado del instrumento virtual. Las
+  líneas naranjas son datos numéricos; la línea discontinua ocre es el
+  \emph{error cluster}, que impone el orden de ejecución. El bucle \ttt{For}
+  (marco gris) se ejecuta una vez por cada valor de la rampa.}
+  \label{fig:bloques}
+\end{figure}
+
+\begin{observacion}[Por qué «1 Sample (On Demand)»]
+  No queremos generar una forma de onda continua sino un \emph{escalón} por
+  iteración: imponer un valor de $\Vin$, esperar a que el circuito se
+  estabilice y medir. Es un barrido \emph{cuasiestático}: cada punto
+  $(\VD,\ID)$ es un estado estacionario, como en un trazador de curvas
+  comercial, y la característica obtenida no depende de la velocidad de
+  barrido (a diferencia de un osciloscopio en modo $XY$ con una señal
+  triangular rápida, en el que aparecerían efectos capacitivos).
+\end{observacion}
+
+% =====================================================================
+\section{Lo que veremos en la gráfica}
+\label{sec:grafica}
+% =====================================================================
+
+Las figuras de esta sección se han obtenido \emph{simulando} el experimento
+(ecuación de Shockley con resistencia serie, $R=\SI{1}{k\ohm}$, rampa de
+$-5$ a $\SI{5}{V}$ en 101 pasos y ruido de \SI{1}{mV} en AI-1): muestran el
+aspecto esperado, pero los valores numéricos de vuestros diodos serán
+distintos.
+
+\subsection{Evolución temporal del barrido}
+
+Antes de la gráfica $XY$ conviene entender qué ocurre iteración a iteración
+(\cref{fig:temporal}). Mientras el diodo no conduce, $\ID\simeq0$ y no cae
+tensión en $R$, luego $\VD\simeq\Vin$: la tensión medida \emph{sigue} a la
+impuesta. Al alcanzar el umbral, $\VD$ se \emph{satura} en $\approx\Vg$ y todo
+el exceso $\Vin-\Vg$ cae en $R$: la corriente crece linealmente con el índice
+de la muestra.
+
+\begin{figure}[htbp]
+  \centering
+  \input{figuras/temporal.tex}
+  \caption{Barrido de un LED rojo en función del índice de muestra $k$
+  (cada \SI{100}{ms}). Arriba: tensión impuesta $\Vin$ y medida $\VD$; por
+  encima del umbral $\VD$ queda anclada en $\approx\SI{1.8}{V}$. Abajo:
+  corriente calculada, nula hasta el umbral y después
+  $\ID\simeq(\Vin-\Vg)/R$.}
+  \label{fig:temporal}
+\end{figure}
+
+\subsection{Diodo pn y diodo Zener}
+
+\begin{figure}[htbp]
+  \centering
+  \input{figuras/iv_pn_zener.tex}
+  \caption{Características $\ID(\VD)$ simuladas. (a) Diodo pn de Si: en
+  inversa $\ID\simeq0$ en todo el rango; en directa conduce a partir de
+  $\Vg\simeq\SI{\umbralpn}{V}$. (b) Diodo Zener de \SI{3.3}{V}: en directa se
+  comporta como el pn ($\Vg\simeq\SI{\umbralzener}{V}$); en inversa entra en
+  ruptura y $\VD$ queda fija en $-\VZ$, con $\VZ\simeq\SI{\tensionzener}{V}$
+  obtenida extrapolando la rama inversa.}
+  \label{fig:pn-zener}
+\end{figure}
+
+En la gráfica $XY$ (\cref{fig:pn-zener}) se reconocen las regiones de la
+característica:
+\begin{enumerate}
+  \item \textbf{Corte (inversa)}: puntos sobre el eje $\ID=0$, igualmente
+    espaciados en $\VD$ porque $\VD=\Vin$.
+  \item \textbf{Codo}: transición en torno a $\Vg$.
+  \item \textbf{Conducción}: rama casi vertical; los puntos se reparten
+    uniformemente \emph{en corriente} (paso $\Delta\Vin/R$) y se apiñan en
+    tensión.
+  \item \textbf{Ruptura} (solo Zener): rama vertical en $\VD=-\VZ$, con
+    corriente negativa $(\Vin+\VZ)/R$.
+\end{enumerate}
+
+\subsection{LED de distintos colores}
+
+\begin{figure}[htbp]
+  \centering
+  \input{figuras/iv_leds.tex}
+  \caption{Características $\ID(\VD)$ simuladas de los siete LED, con las
+  rectas de extrapolación (discontinuas) que definen $\Vg$. El umbral se
+  desplaza hacia la derecha al disminuir $\lambda$: IR $<$ rojo $<$ amarillo
+  $<$ verde $<$ azul $\approx$ blanco $<$ UV. Como $I_{\max}=(\SI{5}{V}-\Vg)/R$,
+  los LED de umbral alto alcanzan menos corriente.}
+  \label{fig:leds}
+\end{figure}
+
+La \cref{fig:leds} es la gráfica principal del informe. Al ejecutar el
+programa, observad además a qué corriente empieza a verse luz: los LED
+modernos son visibles con decenas de $\si{\micro A}$, es decir, ya en el codo.
+El LED IR no se ve a simple vista, pero sí con la cámara de un teléfono.
+
+\begin{observacion}[Lo que \emph{no} veremos]
+  En inversa los LED no entran en ruptura con $|\VD|\le\SI{5}{V}$ (su
+  tensión inversa máxima suele ser \SI{5}{V}): la rama negativa será plana. Si
+  alguna curva aparece «al revés» o con $\VD$ siempre igual a $\Vin$, el LED
+  está invertido o el circuito abierto.
+\end{observacion}
+
+% =====================================================================
+\section{Análisis de los datos}
+\label{sec:analisis}
+% =====================================================================
+
+\subsection{Extracción de la tensión umbral y de la tensión Zener}
+
+\begin{laboratorio}{Procedimiento recomendado}{procedimiento}
+  \begin{enumerate}[leftmargin=2em]
+    \item Cargad el fichero (columnas $\Vin$, $\VD$, $\ID$) y representad
+      $\ID$ frente a $\VD$ con puntos, sin unirlos.
+    \item Seleccionad el tramo de alta corriente, por ejemplo
+      $\ID>I_{\max}/2$, y ajustad una recta $\ID=a\VD+b$ por mínimos
+      cuadrados.
+    \item La tensión umbral es la intersección con el eje: $\Vg=-b/a$. Su
+      incertidumbre se obtiene propagando las de $a$ y $b$ (incluyendo su
+      covarianza).
+    \item Para el Zener, repetid el ajuste en la rama inversa de alta corriente
+      ($\ID<I_{\min}/2$): $\VZ=b/a$ con el signo adecuado.
+    \item Indicad siempre el criterio usado: otros criterios (p.\,ej.\
+      $\Vg=\VD$ a $\ID=\SI{0.1}{mA}$) dan valores algo distintos.
+  \end{enumerate}
+\end{laboratorio}
+
+\begin{observacion}[Fuentes de incertidumbre]
+  La resolución de AI-1 (16 bits) y su ruido ($\sim$\SI{1}{mV}) apenas afectan
+  a $\VD$; la tolerancia de $R$ (5\,\%) escala $\ID$ pero no desplaza la
+  intersección con $\ID=0$. Lo que más influye es la \emph{elección del tramo}
+  de ajuste y la temperatura del diodo. Medid el valor real de $R$ con el
+  multímetro e introducidlo en el panel.
+\end{observacion}
+
+\subsection{Umbral frente a energía del fotón: estimación de \texorpdfstring{$h$}{h}}
+\label{sec:planck}
+
+Según~\eqref{eq:umbral-lambda}, representando $\Vg$ frente a
+$E_{\text{ph}}=hc/\lambda_p$ (en eV) los puntos deben alinearse sobre una
+recta de pendiente próxima a~1 (\cref{fig:planck}); equivalentemente, cada LED
+da una estimación de la constante de Planck,
+\begin{destacada}
+  h\simeq\frac{e\,\Vg\,\lambda_p}{c},
+  \label{eq:planck}
+\end{destacada}
+que con los datos simulados de la \cref{tab:resultados} sale entre
+$5{,}5$ y $\SI{7e-34}{J.s}$ (valor exacto: $\SI{6.626e-34}{J.s}$). La dispersión
+refleja las limitaciones comentadas en la observación~\ref{obs:desv}.
+
+\begin{figure}[htbp]
+  \centering
+  \input{figuras/planck.tex}
+  \caption{Tensión umbral (datos simulados) frente a la energía del fotón. La
+  línea continua es la relación ideal $e\Vg=E_{\text{ph}}$; la discontinua, el
+  ajuste lineal $\Vg=\num{\pendienteajuste}\,E_{\text{ph}}/e\num{\ordenadaajuste}\,\si{V}$
+  (sin el LED blanco, cuyo umbral es el de su chip azul).}
+  \label{fig:planck}
+\end{figure}
+
+\begin{table}[htbp]
+  \centering\small
+  \caption{Ejemplo de tabla de resultados para el informe (valores
+  simulados). $h$ se estima con la ec.~\eqref{eq:planck}.}
+  \label{tab:resultados}
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabular}{@{}l l c c c c@{}}
+    \toprule
+    \textbf{LED} & \textbf{Material} & $\lambda_p$ (nm) & $E_{\text{ph}}$ (eV)
+      & $\Vg$ (V) & $h$ ($10^{-34}$\,J\,s)\\
+    \midrule
+    \tablaumbral
+    \midrule
+    Diodo pn & Si & --- & --- & \num{\umbralpn} & ---\\
+    Zener    & Si & --- & --- & \num{\umbralzener}\ ($\VZ=\num{\tensionzener}$) & ---\\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% =====================================================================
+\section{Lista de comprobación y evaluación}
+\label{sec:checklist}
+% =====================================================================
+
+\begin{tcolorbox}[enhanced,sharp corners,boxrule=0pt,frame hidden,
+  borderline west={2.2pt}{0pt}{navy},lineas=grisclaro,
+  interior style={left color=azulclaro,right color=white},left=10pt,right=8pt]
+\small\setlist[itemize]{label=\casilla,leftmargin=1.4em,itemsep=1pt,topsep=2pt}
+\begin{minipage}[t]{0.48\linewidth}
+{\color{navy}\bfseries Montaje}
+\begin{itemize}
+  \item $R=\SI{1}{k\ohm}$ medida con el multímetro.
+  \item Diodo/LED con el ánodo hacia $R$.
+  \item AO-0\,$\to$\,$R$; AI-1\,$\to$\,ánodo; GND\,$\to$\,cátodo.
+  \item (myDAQ) AI-1\,$-$ a masa.
+\end{itemize}
+{\color{navy}\bfseries Programa}
+\begin{itemize}
+  \item Rampa de $-5$ a $\SI{5}{V}$, $N\ge100$.
+  \item Espera de \SI{100}{ms} en el bucle.
+  \item DAQ en \ttt{1 Sample (On Demand)}, $\pm\SI{5}{V}$.
+  \item \ttt{Clear data on each call} desactivado.
+  \item AO-0 a \SI{0}{V} al terminar.
+  \item Guardado en \ttt{\%.4e}, transpuesto.
+\end{itemize}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.48\linewidth}
+{\color{navy}\bfseries Medidas}
+\begin{itemize}
+  \item Diodo pn.
+  \item Diodo Zener (anotar su $\VZ$ nominal).
+  \item LED IR, rojo, amarillo, verde, azul, blanco y UV.
+  \item Un fichero por componente, con nombre claro.
+  \item Anotar $\lambda_p$ de cada LED (hoja de datos).
+\end{itemize}
+{\color{navy}\bfseries Informe (máx.\ 3 páginas)}
+\begin{itemize}
+  \item Código subido (uno por grupo, nombres en el panel).
+  \item Explicación del panel frontal y del diagrama.
+  \item Gráficas $\ID(\VD)$ como las del \cref{sec:grafica}.
+  \item $\Vg$ de cada diodo y $\VZ$ del Zener.
+  \item Discusión de $\Vg$ frente a color y $\lambda$.
+\end{itemize}
+\end{minipage}
+\end{tcolorbox}
+
+% =====================================================================
+\clearpage
+\appendix
+\section{Formulario}
+% =====================================================================
+
+\begin{center}
+\renewcommand{\arraystretch}{2.0}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.36\linewidth} X@{}}
+  \toprule
+  Ecuación de Shockley & $\displaystyle \ID=\IS\bigl(e^{\VD/n\VT}-1\bigr),\qquad \VT=\frac{k_BT}{e}\simeq\SI{25.9}{mV}$\\
+  Resistencia dinámica & $\displaystyle r_d=\frac{\mathrm d\VD}{\mathrm d\ID}\simeq\frac{n\VT}{\ID}$\\
+  Corriente en el circuito & $\displaystyle \ID\,(\si{mA})=\frac{\Vin-\VD}{R\,(\si{k\ohm})}$\\
+  Recta de carga & $\displaystyle \ID=\frac{\Vin}{R}-\frac{\VD}{R},\qquad I_{\max}\simeq\frac{\Vin-\Vg}{R}$\\
+  Umbral por extrapolación & $\displaystyle \ID\simeq a\VD+b\ \Rightarrow\ \Vg=-\frac{b}{a}$\\
+  Color del LED & $\displaystyle \lambda\simeq\frac{hc}{\Eg},\qquad \lambda[\si{nm}]\simeq\frac{1240}{\Eg[\si{eV}]}$\\
+  Umbral y longitud de onda & $\displaystyle e\Vg\simeq\frac{hc}{\lambda}\ \Rightarrow\ h\simeq\frac{e\Vg\lambda}{c}$\\
+  Constantes & $h=\SI{6.626e-34}{J.s}$,\quad $c=\SI{2.998e8}{m/s}$\\[-8pt]
+   & $e=\SI{1.602e-19}{C}$,\quad $k_B=\SI{8.617e-5}{eV/K}$\\
+  \bottomrule
+\end{tabularx}
+\end{center}
+
+% =====================================================================
+\begin{thebibliography}{9}
+\addcontentsline{toc}{section}{Referencias}
+\small
+\bibitem{guion} Instrumentación Electrónica, \emph{Práctica \#3:
+  Identificación y caracterización de diodos}, Grado en Física, Universidad de
+  Salamanca, curso 2026/2027.
+\bibitem{sze} S.\,M.~Sze y K.\,K.~Ng, \emph{Physics of Semiconductor Devices},
+  3.ª ed., Wiley, 2007.
+\bibitem{pierret} R.\,F.~Pierret, \emph{Semiconductor Device Fundamentals},
+  Addison-Wesley, 1996.
+\bibitem{schubert} E.\,F.~Schubert, \emph{Light-Emitting Diodes}, 2.ª ed.,
+  Cambridge University Press, 2006.
+\bibitem{horowitz} P.~Horowitz y W.~Hill, \emph{The Art of Electronics},
+  3.ª ed., Cambridge University Press, 2015.
+\bibitem{sedra} A.\,S.~Sedra y K.\,C.~Smith, \emph{Microelectronic Circuits},
+  7.ª ed., Oxford University Press, 2015.
+\bibitem{shockley} W.~Shockley, «The theory of p-n junctions in
+  semiconductors and p-n junction transistors», \emph{Bell Syst.\ Tech.\ J.}
+  \textbf{28}, 435--489 (1949).
+\bibitem{mydaq} National Instruments, \emph{NI myDAQ User Guide}.
+\end{thebibliography}
+
+\end{document}

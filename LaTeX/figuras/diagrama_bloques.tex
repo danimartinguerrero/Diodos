@@ -1,0 +1,59 @@
+% Diagrama de bloques simplificado del VI (estilo LabVIEW)
+\begin{tikzpicture}[font=\sffamily\scriptsize,
+  vi/.style={draw=#1!70!black,fill=#1!12,thick,rounded corners=2pt,align=center,
+     minimum height=0.95cm,inner sep=3pt},
+  vi/.default=azul,
+  ctrl/.style={draw=ambar!80!black,fill=ambar!15,thick,align=center,minimum height=0.5cm,
+     inner sep=2pt},
+  dato/.style={Orange!85!black,line width=1.6pt,-{Stealth[length=5pt]}},
+  datov/.style={Orange!85!black,line width=2.6pt,double=white,double distance=.8pt,
+     -{Stealth[length=7pt]}},
+  err/.style={Goldenrod!70!black,line width=1.2pt,densely dashed,-{Stealth[length=5pt]}}]
+  % controles de la rampa
+  \node[ctrl] (vs) at (0,2.2) {V start};
+  \node[ctrl] (ve) at (0,1.4) {V end};
+  \node[ctrl] (nm) at (0,0.6) {\# muestras};
+  \node[vi=navy,minimum width=1.7cm] (ramp) at (2.4,1.4) {Ramp\\Pattern};
+  \draw[dato] (vs.east) -- ++(0.35,0) |- ([yshift=6pt]ramp.west);
+  \draw[dato] (ve.east) -- (ramp.west);
+  \draw[dato] (nm.east) -- ++(0.35,0) |- ([yshift=-6pt]ramp.west);
+  % bucle for
+  \draw[gray!60,line width=4pt,rounded corners=1pt] (3.9,-1.6) rectangle (13.0,3.4);
+  \node[draw=gray!60,fill=white,thick,minimum size=0.4cm,font=\sffamily\scriptsize\bfseries,
+     inner sep=1pt] at (4.25,3.05) {N};
+  \node[draw=gray!60,fill=white,thick,minimum size=0.4cm,font=\sffamily\scriptsize\bfseries,
+     inner sep=1pt] at (4.25,-1.25) {i};
+  \node[gray!60!black,font=\sffamily\scriptsize\bfseries,anchor=south east] at (13.0,3.55) {bucle For};
+  % túnel de auto-indexado
+  \node[draw=Orange!85!black,fill=white,minimum size=0.28cm,inner sep=0pt] (tun) at (3.9,1.4) {};
+  \draw[Orange!85!black,thick] ([xshift=-2pt]tun.center) -- ([xshift=2pt]tun.center)
+     ([yshift=-2pt]tun.center) -- ([yshift=2pt]tun.center);
+  \draw[datov] (ramp.east) -- (tun.west);
+  % bloques internos
+  \node[vi,minimum width=2.2cm] (ao) at (6.0,1.4) {DAQ Assistant\\\textbf{AO-0}: escribe $\Vin$};
+  \node[vi,minimum width=2.2cm] (ai) at (6.0,-0.4) {DAQ Assistant\\\textbf{AI-1}: lee $\VD$};
+  \node[vi=cVerde,minimum width=2.0cm] (ohm) at (8.9,0.5) {$\ID=\dfrac{\Vin-\VD}{R}$};
+  \node[ctrl] (r) at (8.9,2.25) {R (k$\Omega$)};
+  \node[vi=navy,minimum width=1.8cm] (xy) at (11.6,0.5) {Build\\XY Graph};
+  \node[vi=grisazul,minimum width=1.6cm,minimum height=0.7cm] (wait) at (11.6,2.45)
+     {\raisebox{-1pt}{\tikz{\draw[thick](0,0) circle (.12);\draw(0,0)--(0,.09)(0,0)--(.07,0);}}\ Wait until\\ next ms: 100};
+  \draw[dato] (tun.east) -- node[above,black!70]{$\Vin$} (ao.west);
+  \draw[dato] ($(tun.east)+(0.4,0)$) |- ([yshift=8pt]ohm.west);
+  \fill[Orange!85!black] ($(tun.east)+(0.4,0)$) circle (2pt);
+  \draw[dato] (ai.east) -- node[below,black!70]{$\VD$} ++(0.6,0) |- ([yshift=-8pt]ohm.west);
+  \draw[dato] (r.south) -- (ohm.north);
+  \draw[dato] (ohm.east) -- node[above,black!70]{$\ID$} (xy.west);
+  \draw[dato] ($(ai.east)+(0.6,0)$) -- ++(0,-0.75) -| ([xshift=-6pt]xy.south);
+  \fill[Orange!85!black] ($(ai.east)+(0.6,0)$) circle (2pt);
+  \draw[err] (ao.south) -- node[left,Goldenrod!60!black,font=\sffamily\tiny]{error} (ai.north);
+  % fuera del bucle
+  \node[draw=gray!60,fill=black!85,text=white,minimum width=1.6cm,minimum height=0.9cm,
+     align=center] (graf) at (14.6,0.5) {XY\\Graph};
+  \draw[dato] (xy.east) -- (graf.west);
+  \node[vi,minimum width=2.4cm] (ao0) at (8.0,-2.75) {DAQ Assistant\\\textbf{AO-0} $=\SI{0}{V}$};
+  \node[vi=cVerde,minimum width=2.6cm] (file) at (12.0,-2.75) {Write to\\Spreadsheet File\\[-1pt]{\tiny \%.4e, transpose}};
+  \draw[err] (ai.south) -- ++(0,-0.75) -| (6.3,-2.75) -- (ao0.west);
+  \draw[datov] ([xshift=6pt]xy.south) |- ++(0,-1.2) -| (file.north);
+  \node[ctrl] (path) at (14.6,-2.75) {ruta};
+  \draw[dato] (path.west) -- (file.east);
+\end{tikzpicture}

@@ -1,0 +1,85 @@
+% Encapsulados: diodo axial, diodo de vidrio, anatomía del LED, vista superior
+\begin{tikzpicture}[font=\footnotesize,
+  pata/.style={fill=gray!45,draw=gray!70!black,line width=.4pt},
+  etiq/.style={grisazul,font=\scriptsize,align=left},
+  guia/.style={grisazul!80,line width=.35pt}]
+  % ================= (a) diodo axial de plástico
+  \begin{scope}[shift={(0,3.0)}]
+    \node[font=\bfseries\small] at (-1.9,0.75) {(a)};
+    \draw[gray!60!black,line width=1.2pt] (-1.9,0) -- (1.9,0);
+    \shade[top color=gray!55!black,bottom color=black!90,middle color=gray!70!black,
+      rounded corners=2pt] (-0.75,-0.3) rectangle (0.75,0.3);
+    \shade[top color=gray!15,bottom color=gray!55,middle color=white]
+      (0.38,-0.3) rectangle (0.55,0.3);
+    \node[azul,font=\small\bfseries] at (-1.7,-0.35) {A};
+    \node[azul,font=\small\bfseries] at (1.7,-0.35) {K};
+    \node[etiq,anchor=north] at (0.46,-0.35) {banda = cátodo};
+    \node[grisazul,font=\scriptsize] at (0,0.55) {1N4007 (DO-41)};
+  \end{scope}
+  % ================= (b) diodo de vidrio
+  \begin{scope}[shift={(0,1.0)}]
+    \node[font=\bfseries\small] at (-1.9,0.75) {(b)};
+    \draw[gray!60!black,line width=1pt] (-1.9,0) -- (1.9,0);
+    \shade[top color=orange!35,bottom color=orange!70!brown,middle color=orange!15,
+      rounded corners=4pt,opacity=.9] (-0.6,-0.22) rectangle (0.6,0.22);
+    \draw[gray!60!black,line width=.8pt] (-0.45,0) -- (0.3,0);
+    \fill[black!85] (0.32,-0.22) rectangle (0.45,0.22);
+    \node[azul,font=\small\bfseries] at (-1.7,-0.35) {A};
+    \node[azul,font=\small\bfseries] at (1.7,-0.35) {K};
+    \node[etiq,anchor=north] at (0.39,-0.3) {banda = cátodo};
+    \node[grisazul,font=\scriptsize] at (0,0.5) {1N4148 / Zener (DO-35)};
+    % símbolo bajo los encapsulados
+    \draw (-1.1,-2.1) node[left,azul]{A} to[D*] (1.1,-2.1) node[right,azul]{K};
+    \draw[-{Stealth[length=5pt]},rojoaviso,thick] (-0.7,-1.5) -- node[above,font=\scriptsize]{corriente directa} (0.7,-1.5);
+  \end{scope}
+  % ================= (c) anatomía del LED
+  \begin{scope}[shift={(6.4,-0.4)},scale=1.25]
+    \node[font=\bfseries\small] at (-2.9,3.5) {(c)};
+    % patillas
+    \fill[pata] (-0.55,-2.9) rectangle (-0.37,0.05);
+    \fill[pata] (0.37,-2.3) rectangle (0.55,0.05);
+    % electrodos internos
+    \fill[pata] (-0.55,0) -- (-0.55,1.55) -- (-0.3,1.78) -- (-0.12,1.78)
+       -- (-0.12,1.48) -- (-0.37,1.36) -- (-0.37,0) -- cycle;
+    \fill[pata] (-0.05,0.85) -- (-0.05,1.65) -- (0.08,1.65) -- (0.2,1.3)
+       -- (0.55,1.3) -- (0.67,1.65) -- (0.85,1.65) -- (0.85,0.85) -- (0.55,0.85)
+       -- (0.55,0) -- (0.37,0) -- (0.37,0.85) -- cycle;
+    \fill[black!80] (0.31,1.3) rectangle (0.44,1.42);
+    \draw[Goldenrod!80!black,line width=.5pt] (0.375,1.42) .. controls (0.35,2.0) and (-0.1,2.05) .. (-0.21,1.77);
+    % rayos de luz
+    \foreach \a in {60,75,90,105,120}
+      \draw[cRojo,-{Stealth[length=3pt]},line width=.5pt] (0.375,1.5)++(\a:0.25) -- ++(\a:0.95);
+    % cuerpo de epoxi
+    \fill[cRojo!30,opacity=.45] (-1,0.3) -- (-1,2.3) arc (180:0:1) -- (1,0.3) -- cycle;
+    \draw[cRojo!70!black,line width=.6pt] (-1,0.3) -- (-1,2.3) arc (180:0:1) -- (1,0.3);
+    \fill[cRojo!45,opacity=.6] (-1.18,0) rectangle (1.02,0.3);
+    \draw[cRojo!70!black,line width=.6pt] (-1.18,0) rectangle (1.02,0.3);
+    % etiquetas izquierda
+    \draw[guia] (-0.75,2.9) -- (-1.35,3.1) node[left,etiq]{lente de epoxi};
+    \draw[guia] (0.0,1.97) -- (-1.35,2.45) node[left,etiq]{hilo de conexión};
+    \draw[guia] (-0.47,1.2) -- (-1.35,1.5) node[left,etiq]{poste:\\ ánodo (A)};
+    \draw[guia] (-0.46,-1.5) -- (-1.0,-1.5) node[left,etiq]{patilla larga\\ ánodo ($+$)};
+    % etiquetas derecha
+    \draw[guia] (0.4,1.36) -- (1.35,2.7) node[right,etiq]{chip (unión pn)};
+    \draw[guia] (0.62,1.5) -- (1.35,2.05) node[right,etiq]{copa reflectora};
+    \draw[guia] (0.75,1.0) -- (1.35,1.25) node[right,etiq]{yunque:\\ cátodo (K)};
+    \draw[guia] (1.02,0.15) -- (1.35,0.35) node[right,etiq]{borde plano\\ = cátodo};
+    \draw[guia] (0.46,-1.2) -- (1.0,-1.2) node[right,etiq]{patilla corta\\ cátodo ($-$)};
+  \end{scope}
+  % ================= (d) vista superior y símbolo
+  \begin{scope}[shift={(12.4,1.6)}]
+    \node[font=\bfseries\small] at (-1.0,1.7) {(d)};
+    \begin{scope}
+      \clip (-1,-1) rectangle (0.82,1);
+      \fill[cRojo!35] (0,0) circle (0.95);
+      \draw[cRojo!70!black] (0,0) circle (0.95);
+    \end{scope}
+    \draw[cRojo!70!black] (0.82,-0.47) -- (0.82,0.47);
+    \fill[cRojo!20] (0,0) circle (0.7);
+    \draw[cRojo!60!black] (0,0) circle (0.7);
+    \node[etiq] at (0,-1.25) {vista superior};
+    \draw[guia] (0.82,0.25) -- (1.2,0.6) node[above,etiq]{plano};
+    \draw (0,-2.0) node[above right=-1pt,font=\scriptsize\bfseries,azul]{\,$+$} node[left,azul]{A}
+       to[leD*] (0,-3.9) node[left,azul]{K} node[below right=-1pt,font=\scriptsize\bfseries,azul]{\,$-$};
+  \end{scope}
+\end{tikzpicture}

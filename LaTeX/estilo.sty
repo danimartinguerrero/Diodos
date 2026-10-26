@@ -1,0 +1,191 @@
+% =====================================================================
+%  estilo.sty  ·  Estilo de apuntes (réplica del formato del Tema 3 de
+%  Electromagnetismo I) adaptado a la guía de la Práctica 3 de diodos.
+% =====================================================================
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{estilo}[2026/10/26 Estilo apuntes USAL]
+
+\RequirePackage[T1]{fontenc}
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[spanish,es-noshorthands,es-nodecimaldot,es-tabla]{babel}
+\RequirePackage{lmodern}
+\RequirePackage[letterspace=120]{microtype}
+\RequirePackage[a4paper,top=2.6cm,bottom=2.5cm,left=2.4cm,right=2.4cm,
+                headheight=14pt,headsep=0.9cm]{geometry}
+\RequirePackage{amsmath,amssymb,mathtools,empheq}
+\RequirePackage{graphicx}
+\RequirePackage[dvipsnames,svgnames]{xcolor}
+\RequirePackage{tikz}
+\RequirePackage[american,cuteinductors]{circuitikz}
+\RequirePackage{pgfplots}
+\RequirePackage{pgfplotstable}
+\RequirePackage[most]{tcolorbox}
+\RequirePackage{titlesec,titletoc}
+\RequirePackage{fancyhdr}
+\RequirePackage{enumitem}
+\RequirePackage{booktabs,array,tabularx,multirow,colortbl}
+\RequirePackage{caption,subcaption}
+\RequirePackage{siunitx}
+\RequirePackage{textcomp}
+\RequirePackage{xspace}
+\RequirePackage{multicol}
+\RequirePackage{catchfile}
+\RequirePackage{hyperref}
+\RequirePackage[spanish,nameinlink,noabbrev]{cleveref}
+\crefname{table}{tabla}{tablas}\Crefname{table}{Tabla}{Tablas}
+\crefname{figure}{figura}{figuras}\Crefname{figure}{Figura}{Figuras}
+\crefname{section}{apartado}{apartados}
+% flotantes: menos huecos en blanco
+\renewcommand{\topfraction}{0.88}\renewcommand{\bottomfraction}{0.6}
+\renewcommand{\textfraction}{0.08}\renewcommand{\floatpagefraction}{0.78}
+\setcounter{topnumber}{3}\setcounter{totalnumber}{4}
+
+\usetikzlibrary{arrows.meta,calc,positioning,decorations.pathmorphing,
+  decorations.markings,shapes.geometric,shadows,fit,backgrounds,patterns,
+  shadings,intersections}
+\usepgfplotslibrary{groupplots,fillbetween}
+\pgfplotsset{compat=1.18}
+
+% ------------------------------------------------------------ colores
+\definecolor{navy}{HTML}{14284B}      % títulos
+\definecolor{azul}{HTML}{2C5F9E}      % acentos
+\definecolor{azulmed}{HTML}{4F7DB8}
+\definecolor{azulclaro}{HTML}{EAF0F8} % fondos de cajas
+\definecolor{azulpalido}{HTML}{F4F7FB}
+\definecolor{grisazul}{HTML}{5D6E86}  % cabeceras y textos secundarios
+\definecolor{grisclaro}{HTML}{B9C6D8}
+\definecolor{ambar}{HTML}{B8730A}     % cajas "En el laboratorio"
+\definecolor{ambarclaro}{HTML}{FBF4E8}
+\definecolor{rojoaviso}{HTML}{B3261E}
+\definecolor{rojoclaro}{HTML}{FBECEA}
+% colores de los LED en las gráficas
+\definecolor{cIR}{HTML}{7A1F1F}
+\definecolor{cRojo}{HTML}{D62728}
+\definecolor{cAmarillo}{HTML}{E0A800}
+\definecolor{cVerde}{HTML}{2CA02C}
+\definecolor{cAzul}{HTML}{1F5FD6}
+\definecolor{cBlanco}{HTML}{8A8F98}
+\definecolor{cUV}{HTML}{7B2CBF}
+\definecolor{cPN}{HTML}{2B2B2B}
+\definecolor{cZener}{HTML}{C0561E}
+
+\hypersetup{colorlinks=true,linkcolor=azul,citecolor=azul,urlcolor=azul,
+  pdfauthor={Daniel Martín Guerrero},
+  pdftitle={Práctica 3. Identificación y caracterización de diodos LED},
+  pdfsubject={Instrumentación Electrónica}}
+
+\sisetup{output-decimal-marker={,},inter-unit-product=\ensuremath{\,},
+  separate-uncertainty=true,per-mode=symbol}
+\pgfplotsset{/pgf/number format/use comma,
+  every axis/.append style={font=\small,
+    tick label style={font=\footnotesize},
+    label style={font=\small},
+    axis line style={grisazul},
+    tick style={grisazul},
+    grid style={grisclaro!45,line width=.3pt},
+    legend style={font=\footnotesize,draw=grisclaro,fill=white,fill opacity=.92,
+                  text opacity=1,rounded corners=1pt}},
+  medida/.style={only marks,mark=*,mark size=1.15pt},
+}
+
+% ------------------------------------------------------------ párrafos
+\setlength{\parindent}{1.5em}
+\setlength{\parskip}{0pt}
+\linespread{1.06}
+\captionsetup{font=small,labelfont={sc,color=azul},labelsep=period,
+  textfont={color=black!80},margin=0.8cm}
+\captionsetup[sub]{font=small,labelfont={rm,color=black},labelformat=parens,
+  margin=0pt}
+\setlist{itemsep=2pt,topsep=4pt}
+\setlist[itemize,1]{label={\color{azul}\scriptsize$\blacktriangleright$}}
+\setlist[enumerate,1]{label={\textsc{(\roman*)}},leftmargin=2.2em}
+
+% ------------------------------------------------------------ títulos
+\newcommand{\barradeg}[1][\linewidth]{%
+  \par\nointerlineskip\vspace{3pt}%
+  \tikz\shade[left color=azul,right color=white,middle color=azulmed!60]
+    (0,0) rectangle (#1,1.1pt);\par}
+\titleformat{\section}{\Large\bfseries\color{navy}}%
+  {\thesection.}{0.55em}{}[\barradeg]
+\titleformat{\subsection}{\large\bfseries\color{navy}}%
+  {\thesubsection.}{0.55em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{navy}}%
+  {\thesubsubsection.}{0.5em}{}
+\titlespacing*{\section}{0pt}{3.0ex plus .6ex}{2.0ex}
+\titlespacing*{\subsection}{0pt}{2.6ex plus .5ex}{1.4ex}
+
+% ------------------------------------------------------------ cabeceras
+\newcommand{\cabizq}{Instrumentación Electrónica\ \ $\cdot$\ \ Práctica 3}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\color{grisazul}\small\textls[60]{\textsc{\cabizq}}}
+\fancyhead[R]{\color{grisazul}\small\textls[60]{\textsc{\nouppercase{\leftmark}}}}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrule}{\color{grisclaro}\hrule height .5pt\vspace{-.5pt}}
+\renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+\fancypagestyle{plain}{\fancyhf{}\renewcommand{\headrule}{}\fancyfoot[C]{\small\thepage}}
+
+% ------------------------------------------------------------ índice
+\titlecontents{section}[1.6em]{\addvspace{7pt}\bfseries\color{navy}}%
+  {\contentslabel{1.6em}}{}{\hfill\contentspage}
+\titlecontents{subsection}[4.0em]{\addvspace{1pt}\color{azul}}%
+  {\contentslabel{2.4em}}{}{\color{grisclaro}\titlerule*[.6em]{.}\color{black}\contentspage}
+
+% ------------------------------------------------------------ cajas
+\tcbuselibrary{theorems}
+\tcbset{
+  cajabase/.style={enhanced,breakable,sharp corners,boxrule=0pt,
+    frame hidden,borderline west={2.2pt}{0pt}{#1},
+    interior style={left color=#1!9!white,right color=white},
+    left=9pt,right=8pt,top=6pt,bottom=6pt,
+    before skip=9pt,after skip=9pt,
+    fonttitle=\bfseries,coltitle=black,
+    separator sign none,description delimiters parenthesis,
+    description font=\mdseries\color{#1!80!white},
+    detach title,before upper={{\upshape\tcbtitle}\quad}},
+  lineas/.style={borderline north={.4pt}{0pt}{#1},borderline south={.4pt}{0pt}{#1}},
+}
+\newtcbtheorem[number within=section]{definicion}{Definición}%
+  {cajabase=navy,description font=\mdseries\color{azul},lineas=grisclaro}{def}
+\newtcbtheorem[use counter from=definicion]{proposicion}{Proposición}%
+  {enhanced,breakable,frame hidden,interior hidden,boxrule=0pt,
+   left=0pt,right=0pt,top=2pt,bottom=2pt,before skip=8pt,after skip=8pt,
+   fonttitle=\bfseries,coltitle=black,fontupper=\itshape,
+   separator sign none,description delimiters parenthesis,
+   description font=\mdseries\color{azul},
+   detach title,before upper={{\upshape\tcbtitle}.\quad}}{prop}
+\newtcbtheorem[use counter from=definicion]{laboratorio}{En el laboratorio}%
+  {cajabase=ambar,lineas=ambar!35}{lab}
+\newtcbtheorem[use counter from=definicion]{precaucion}{Precaución}%
+  {cajabase=rojoaviso,lineas=rojoaviso!35}{prec}
+
+% Observación: título en cursiva azul, sin caja
+\newenvironment{observacion}[1][]{%
+  \par\addvspace{6pt}\noindent\refstepcounter{tcb@cnt@definicion}%
+  {\color{azul}\itshape Observación~\thetcb@cnt@definicion}%
+  \if\relax\detokenize{#1}\relax\else\ {\color{azul}(#1)}\fi.\ \ignorespaces}%
+  {\par\addvspace{6pt}}
+\newenvironment{demostracion}{\par\addvspace{4pt}\noindent\textit{Demostración.}\ }%
+  {\hfill{\color{navy}\rule{1.4ex}{1.4ex}}\par\addvspace{6pt}}
+
+% ecuación destacada (barra azul a la izquierda, fondo claro)
+\newtcbox{\cajaec}{enhanced,nobeforeafter,tcbox raise base,sharp corners,
+  boxrule=0pt,frame hidden,borderline west={1pt}{0pt}{azulmed},
+  interior style={left color=azulpalido,right color=white},
+  left=6pt,right=8pt,top=3pt,bottom=3pt}
+\newenvironment{destacada}{\empheq[box=\cajaec]{equation}}{\endempheq}
+
+% ------------------------------------------------------------ utilidades
+\newcommand{\VD}{V_{\mathrm D}}
+\newcommand{\ID}{I_{\mathrm D}}
+\newcommand{\Vin}{V_{\mathrm{in}}}
+\newcommand{\Vg}{V_{\gamma}}
+\newcommand{\VZ}{V_{\mathrm Z}}
+\newcommand{\IS}{I_{\mathrm S}}
+\newcommand{\VT}{V_{\mathrm T}}
+\newcommand{\Eg}{E_{\mathrm g}}
+\newcommand{\Rs}{R_{\mathrm s}}
+\newcommand{\ttt}[1]{\textsf{#1}}            % objetos de LabVIEW
+\newcommand{\ruta}[1]{\textsf{\small #1}}     % rutas de menú
+\newcommand{\casilla}{{\color{azul}$\square$}\ }
+\endinput

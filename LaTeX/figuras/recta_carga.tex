@@ -1,0 +1,20 @@
+% Rectas de carga y puntos de trabajo de un LED rojo
+\begin{tikzpicture}
+\begin{axis}[width=0.86\linewidth,height=6.6cm,
+  xmin=0,xmax=5.3,ymin=0,ymax=5.4,
+  xlabel={$\VD$ (V)},ylabel={$\ID$ (mA)},grid=major,
+  legend pos=north east,legend cell align=left]
+  \addplot[cRojo,line width=1.6pt] table[x=VD,y=ID]{datos/curva_rojo.dat};
+  \addlegendentry{característica del LED rojo}
+  \pgfplotsinvokeforeach{2,3,4,5}{
+    \addplot[azulmed,thick,domain=0:#1,samples=2,forget plot]{#1-x};
+    \node[font=\scriptsize,azul,anchor=south west,rotate=-21,inner sep=1pt,fill=white,fill opacity=.85,text opacity=1] at (axis cs:0.12,#1-0.12)
+      {$\Vin=\SI{#1}{V}$};}
+  \addplot[navy,only marks,mark=*,mark size=2.2pt] table[x=VD,y=ID]{datos/recta_carga.dat};
+  \addlegendentry{punto de trabajo}
+  \addlegendimage{azulmed,thick}\addlegendentry{recta de carga, pendiente $-1/R$}
+  \draw[grisazul,densely dashed] (axis cs:0,3.136) -- (axis cs:3.2,3.136);
+  \node[font=\scriptsize,grisazul,anchor=south west,fill=white,inner sep=1pt] at (axis cs:2.0,3.2)
+     {$I_{\max}\simeq(\SI{5}{V}-\Vg)/R$};
+\end{axis}
+\end{tikzpicture}

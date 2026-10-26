@@ -1,0 +1,32 @@
+% Características I-V del diodo pn y del Zener
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=2 by 1,horizontal sep=1.5cm},
+  width=0.53\linewidth,height=6.4cm,xmin=-5.3,xmax=1.3,
+  xlabel={$\VD$ (V)},grid=major,legend pos=north west,legend cell align=left]
+  % ---------- (a) pn
+  \nextgroupplot[ylabel={$\ID$ (mA)},ymin=-2.2,ymax=4.8,title={(a) Diodo pn (Si)},
+     title style={font=\small\color{navy}}]
+    \addplot[medida,cPN] table[x=VD,y=ID]{datos/iv_pn.dat};
+    \addlegendentry{datos}
+    \addplot[azul,dashed,thick] table[x=VD,y=ID]{datos/fit_pn.dat};
+    \addlegendentry{extrapolación}
+    \fill[rojoaviso] (axis cs:\umbralpn,0) circle (1.8pt);
+    \node[rojoaviso,font=\scriptsize,anchor=north west] at (axis cs:0.2,-0.15) {$\Vg$};
+    \node[font=\scriptsize,grisazul,align=center] at (axis cs:-2.6,-0.75)
+      {corte: $\ID\simeq0$, $\VD=\Vin$};
+  % ---------- (b) Zener
+  \nextgroupplot[ymin=-2.2,ymax=4.8,title={(b) Diodo Zener ($\VZ$ nominal \SI{3.3}{V})},
+     title style={font=\small\color{navy}}]
+    \addplot[medida,cZener] table[x=VD,y=ID]{datos/iv_zener.dat};
+    \addlegendentry{datos}
+    \addplot[azul,dashed,thick,forget plot] table[x=VD,y=ID]{datos/fit_zener.dat};
+    \addplot[azul,dashed,thick] table[x=VD,y=ID]{datos/fitz_zener.dat};
+    \addlegendentry{extrapolación}
+    \fill[rojoaviso] (axis cs:\umbralzener,0) circle (1.8pt);
+    \fill[rojoaviso] (axis cs:-\tensionzener,0) circle (1.8pt);
+    \node[rojoaviso,font=\scriptsize,anchor=south east] at (axis cs:\umbralzener,0.1) {$\Vg$};
+    \node[rojoaviso,font=\scriptsize,anchor=south west] at (axis cs:-\tensionzener,0.1) {$-\VZ$};
+    \node[font=\scriptsize,grisazul,align=center,anchor=north] at (axis cs:-1.4,-0.9)
+      {ruptura: $\VD\simeq-\VZ$};
+\end{groupplot}
+\end{tikzpicture}

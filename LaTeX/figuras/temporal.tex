@@ -1,0 +1,24 @@
+% Evolución temporal del barrido para un LED rojo
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=1 by 2,vertical sep=0.35cm,
+    xticklabels at=edge bottom},
+  width=0.88\linewidth,xmin=0,xmax=100,grid=major,
+  legend pos=north west,legend cell align=left]
+  \nextgroupplot[height=5.0cm,ylabel={Tensión (V)},ymin=-5.5,ymax=5.5]
+    \fill[azulclaro,opacity=.7] (axis cs:68,-5.5) rectangle (axis cs:100,5.5);
+    \addplot[grisazul,thick,mark=none] table[x=k,y=Vin]{datos/iv_rojo.dat};
+    \addlegendentry{$\Vin$ (AO-0)}
+    \addplot[cRojo,mark=*,mark size=1pt,only marks] table[x=k,y=VD]{datos/iv_rojo.dat};
+    \addlegendentry{$\VD$ (AI-1)}
+    \node[font=\scriptsize,azul,anchor=north] at (axis cs:84,-1.2) {LED en conducción};
+    \node[font=\scriptsize,grisazul,anchor=south] at (axis cs:30,0.2) {$\VD\simeq\Vin$ (corte)};
+    \draw[rojoaviso,densely dashed] (axis cs:0,1.77) -- (axis cs:100,1.77)
+      node[pos=0.08,above,font=\scriptsize]{$\Vg$};
+  \nextgroupplot[height=3.6cm,ylabel={$\ID$ (mA)},xlabel={Índice de muestra $k$},
+    ymin=-0.4,ymax=3.6]
+    \fill[azulclaro,opacity=.7] (axis cs:68,-0.4) rectangle (axis cs:100,3.6);
+    \addplot[navy,mark=*,mark size=1pt,only marks] table[x=k,y=ID]{datos/iv_rojo.dat};
+    \node[font=\scriptsize,navy,anchor=west] at (axis cs:3,1.9)
+      {$\ID=(\Vin-\VD)/R$};
+\end{groupplot}
+\end{tikzpicture}

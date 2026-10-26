@@ -1,0 +1,35 @@
+% Espectros de emisión de los LED (modelo gaussiano) con barra del visible
+\begin{tikzpicture}
+\begin{axis}[width=\linewidth,height=6.3cm,
+  xmin=350,xmax=1000,ymin=-0.13,ymax=1.2,
+  xlabel={Longitud de onda $\lambda$ (nm)},ylabel={Intensidad normalizada},
+  ytick={0,0.25,0.5,0.75,1},yticklabel style={/pgf/number format/fixed,
+    /pgf/number format/precision=2},
+  xtick={400,450,...,1000},
+  grid=major,axis on top=false,
+  every axis plot/.append style={thick}]
+  % barra del visible
+  \pgfplotsinvokeforeach{380,382,...,748}{%
+    \definecolor{wl#1}{wave}{#1}%
+    \fill[wl#1] (axis cs:#1,-0.11) rectangle (axis cs:#1+2.3,-0.035);}
+  \node[font=\scriptsize,grisazul] at (axis cs:870,-0.072) {infrarrojo $\rightarrow$};
+  \node[font=\scriptsize,grisazul] at (axis cs:365,-0.072) {UV};
+  % espectros
+  \addplot[cUV,fill=cUV,fill opacity=.18] table[x=lam,y=uv]{datos/espectros.dat} \closedcycle;
+  \addplot[cAzul,fill=cAzul,fill opacity=.18] table[x=lam,y=azul]{datos/espectros.dat} \closedcycle;
+  \addplot[cVerde,fill=cVerde,fill opacity=.18] table[x=lam,y=verde]{datos/espectros.dat} \closedcycle;
+  \addplot[cAmarillo,fill=cAmarillo,fill opacity=.22] table[x=lam,y=amarillo]{datos/espectros.dat} \closedcycle;
+  \addplot[cRojo,fill=cRojo,fill opacity=.18] table[x=lam,y=rojo]{datos/espectros.dat} \closedcycle;
+  \addplot[cIR,fill=cIR,fill opacity=.18] table[x=lam,y=ir]{datos/espectros.dat} \closedcycle;
+  \addplot[cBlanco,dashed,line width=1pt] table[x=lam,y=blanco]{datos/espectros.dat};
+  % etiquetas
+  \foreach \xx/\yy/\lab/\col/\anc in {400/1.0/UV/cUV/south,470/1.0/azul/cAzul/south,525/1.0/verde/cVerde/south,
+      590/1.08/amarillo/cAmarillo/south,632/1.0/rojo/cRojo/south,940/1.0/IR/cIR/south}{
+    \edef\temp{\noexpand\node[font=\noexpand\scriptsize\noexpand\bfseries,\col,anchor=\anc]
+      at (axis cs:\xx,\yy) {\lab};}
+    \temp}
+  \node[font=\scriptsize,cBlanco!80!black,align=left,anchor=west] at (axis cs:690,0.62)
+     {blanco: chip azul\\ + fósforo YAG:Ce};
+  \draw[cBlanco,-{Stealth[length=4pt]}] (axis cs:692,0.58) -- (axis cs:612,0.47);
+\end{axis}
+\end{tikzpicture}
