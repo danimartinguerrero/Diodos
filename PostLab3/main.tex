@@ -265,10 +265,17 @@ Para poder tomar los datos se utilizó el programa mostrado en el apartado anter
 Las medidas tomadas para cada diodo se representaron gráficamente y se muestran a continuación:
 \begin{figure}[htbp]
   \centering
-  \input{figuras/datos_iv.tex}
-  \caption{Comparativa de cada representación $I_D(V_D)$ para cada diodo. (a)
-  Barrido completo; (b) ampliación de la rama directa con las rectas de
-  ajuste del \cref{sec:analisis}.}
+  \begin{subfigure}[b]{0.53\linewidth}\centering
+    \includegraphics[width=\linewidth]{Diodos_comparativa.pdf}
+    \caption{Vista general.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[b]{0.44\linewidth}\centering
+    \input{figuras/datos_iv.tex}
+    \caption{Ampliación de la rama directa.}
+  \end{subfigure}
+  \caption{Comparativa de cada representación $I_D(V_D)$ para cada diodo. (b)
+  Ampliación de la rama directa con las rectas de ajuste del
+  \cref{sec:analisis}.}
   \label{fig:caida}
 \end{figure}
 

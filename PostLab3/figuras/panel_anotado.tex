@@ -11,13 +11,11 @@
   \node[inner sep=0,anchor=south west] (img) at (0,0)
     {\includegraphics[width=\linewidth]{img/panel_frontal.jpg}};
   \begin{scope}[x={(img.south east)},y={(img.north west)}]
-    % controles de la rampa
-    \node[caja=ambar,anchor=west] (c) at (0.105,0.16)
+    % controles de la rampa (esquina inferior izquierda, una sola flecha)
+    \node[caja=ambar,anchor=south west] (c) at (0.006,0.012)
       {\textbf{\textcolor{ambar}{\ding{172}} Controles numéricos (DBL)}\\
-       rampa: $V_{\text{start}}=-5$\,V, $V_{\text{end}}=5$\,V,\\ 150 muestras};
-    \draw[flecha=ambar] (c.north west) ++(0.012,0) -- (0.075,0.50);
-    \draw[flecha=ambar] (c.north west) ++(0.022,0) -- (0.075,0.39);
-    \draw[flecha=ambar] (c.west) -- (0.075,0.28);
+       $V_{\text{start}}=-5$\,V, $V_{\text{end}}=5$\,V,\\ 150 muestras};
+    \draw[flecha=ambar] (c.north west) ++(0.055,0) -- (0.061,0.255);
     % R
     \node[caja=ambar,anchor=west] (r) at (0.36,0.62)
       {\textbf{\textcolor{ambar}{\ding{173}} Control $R$ (k$\Omega$)}\\ valor de la resistencia: 1};
@@ -26,16 +24,15 @@
     \node[caja=cVerde,anchor=west] (i) at (0.455,0.43)
       {\textbf{\textcolor{cVerde}{\ding{174}} Indicador $I_D$ (mA)}\\ último valor: 4,326 mA\\ (con $V_{\text{in}}=5$\,V)};
     \draw[flecha=cVerde] (i.west) -- (0.335,0.37);
-    % imagen del circuito
+    % imagen del circuito (arriba, flecha corta hacia abajo)
     \node[caja,anchor=north west] (img2) at (0.18,0.985)
       {\textbf{\textcolor{azul}{\ding{175}} Imagen importada (LED\_cir.png)}\\
-       AO-0 impone $V_{\text{in}}$ sobre $R$ + diodo; AI-1 lee $V_D$;\\ GND es la masa común};
-    \draw[flecha] (img2.south west) ++(0.03,0) -- (0.115,0.69);
-    \draw[flecha] (img2.south) ++(0.02,0) -- (0.39,0.33);
-    % ruta del fichero
-    \node[caja=navy,anchor=east] (p) at (0.585,0.875)
+       AO-0 impone $V_{\text{in}}$ sobre $R$ + diodo; AI-1 lee $V_D$;\\ GND es la tierra};
+    \draw[flecha] (img2.south) ++(-0.06,0) -- ++(0,-0.07);
+    % ruta del fichero (esquina superior derecha)
+    \node[caja=navy,anchor=north east] (p) at (0.993,0.985)
       {\textbf{\textcolor{navy}{\ding{176}} Control de ruta}\\ fichero de salida (.txt)};
-    \draw[flecha=navy] (p.east) -- (0.615,0.87);
+    \draw[flecha=navy] (p.west) -- (0.825,0.93);
     % gráfica XY
     \node[caja=cUV,anchor=east] (g) at (0.66,0.74)
       {\textbf{\textcolor{cUV}{\ding{177}} XY Graph}\\ eje $Y$: $I_D$ (mA)\\ eje $X$: $V_D$ (V)};
@@ -44,8 +41,8 @@
     \node[caja=cUV,anchor=east] (k) at (0.905,0.56)
       {rama directa:\\ conduce a partir\\ de $V_u\approx0{,}6$\,V};
     \draw[flecha=cUV] (k.south east) ++(-0.005,0) -- (0.925,0.36);
-    \node[caja=cUV,anchor=west] (corte) at (0.715,0.22)
+    \node[caja=cUV,anchor=south west] (corte) at (0.715,0.36)
       {corte: $I_D\simeq0$};
-    \draw[flecha=cUV] (corte.north) -- (0.78,0.30);
+    \draw[flecha=cUV] (corte.south) -- ++(0,-0.108);
   \end{scope}
 \end{tikzpicture}

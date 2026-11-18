@@ -1,54 +1,32 @@
-% Características I-V medidas (datos del grupo) y rectas de ajuste
+% Ampliación de la rama directa con las rectas de ajuste (datos del grupo)
 \colorlet{cBlancoM}{teal!70}
 \pgfplotsset{
   serie/.style={#1,mark=*,mark size=.75pt,line width=.5pt},
   ajuste/.style={#1!70!black,dashed,line width=.7pt,forget plot},
 }
 \begin{tikzpicture}
-\begin{groupplot}[group style={group size=2 by 1,horizontal sep=1.15cm},
-  height=6.0cm,grid=major,xlabel={$V_D$ (V)},
-  legend cell align=left,legend style={font=\scriptsize,row sep=-2pt}]
-  % ---------------- (a) rango completo
-  \nextgroupplot[width=0.50\linewidth,xmin=-5.2,xmax=3.1,ymin=-3.1,ymax=4.8,
-    ylabel={$I_D$ (mA)},title={(a) Barrido completo, $-5$ a $5$\,V},
-    title style={font=\small\color{navy}},
-    legend to name=leyendaIV,legend columns=8,
-    legend style={font=\scriptsize,draw=grisclaro,/tikz/every even column/.append style={column sep=6pt}}]
-    \foreach \fic/\col/\n in {pn/cPN/Diodo pn,zener/cZener/Zener,ir/cUV/LED IR,
-        rojo/cRojo/LED rojo,amarillo/cAmarillo/LED amarillo,verde/cVerde/LED verde,
-        azul/cAzul/LED azul,blanco/cBlancoM/LED blanco}{
-      \edef\temp{\noexpand\addplot[serie=\col] table[x=VD,y=ID]{datos/\fic.dat};
-        \noexpand\addlegendentry{\n}}
-      \temp}
-    % ruptura Zener: I = 12,939 + 7,007 V
-    \addplot[ajuste=cZener,domain=-2.26:-1.847,samples=2]{12.939+7.007*x};
-    \fill[rojoaviso] (axis cs:-1.847,0) circle (1.6pt);
-    \node[font=\scriptsize,rojoaviso,anchor=west] (vz) at (axis cs:-1.45,-1.7) {$V_Z=-1{,}85$\,V};
-    \draw[rojoaviso,-{Stealth[length=4pt]}] (vz.north west) -- (axis cs:-1.82,-0.08);
-    \node[font=\scriptsize,grisazul,anchor=north] at (axis cs:-3.6,-0.25) {corte: $I_D\simeq0$};
-  % ---------------- (b) zoom de la rama directa
-  \nextgroupplot[width=0.50\linewidth,xmin=0.35,xmax=2.85,ymin=-0.2,ymax=4.6,
-    title={(b) Rama directa y rectas de ajuste},title style={font=\small\color{navy}}]
-    \foreach \fic/\col in {pn/cPN,zener/cZener,ir/cUV,rojo/cRojo,amarillo/cAmarillo,
-        verde/cVerde,azul/cAzul,blanco/cBlancoM}{
-      \edef\temp{\noexpand\addplot[serie=\col,forget plot] table[x=VD,y=ID]{datos/\fic.dat};}
-      \temp}
-    % rectas I = a + b V entre V_u y la corriente máxima
-    \foreach \col/\a/\b/\vu/\imax/\lab/\pos in {
-        cPN/-35.005/58.209/0.601/4.33/pn/below,
-        cZener/-67.097/92.632/0.724/4.25/Z/below,
-        cUV/-74.494/67.862/1.098/3.88/IR/below,
-        cRojo/-78.727/48.264/1.631/3.32/R/below,
-        cAmarillo/-60.091/34.011/1.767/3.18/A/below,
-        cVerde/-44.739/24.768/1.806/3.10/V/below,
-        cAzul/-52.505/20.954/2.506/2.40/Az/below,
-        cBlancoM/-59.723/23.111/2.584/2.34/B/below}{
-      \edef\temp{\noexpand\addplot[ajuste=\col,domain=\vu:(\imax-(\a))/(\b),samples=2]{\a+\b*x};
-        \noexpand\fill[\col] (axis cs:\vu,0) circle (1.5pt);}
-      \temp}
-    \draw[black!50] (axis cs:0.35,0) -- (axis cs:2.85,0);
-\end{groupplot}
-  \node[anchor=north] at ($(group c1r1.south)!0.5!(group c2r1.south)+(0,-0.85)$) {\pgfplotslegendfromname{leyendaIV}};
-  \node[anchor=north,font=\scriptsize,navy] at ($(group c1r1.south)!0.5!(group c2r1.south)+(0,-1.45)$)
-    {$\bullet$\ tensión umbral $V_u=-a/b$\qquad \tikz\draw[dashed,thick] (0,0.08)--(0.5,0.08);\ recta de ajuste $I=a+bV$};
-\end{tikzpicture}
+\begin{axis}[width=\linewidth,height=5.0cm,grid=major,xlabel={$V_D$ (V)},
+  ylabel={$I_D$ (mA)},xmin=0.35,xmax=2.98,ymin=-0.2,ymax=4.6]
+  \foreach \fic/\col in {pn/cPN,zener/cZener,ir/cUV,rojo/cRojo,amarillo/cAmarillo,
+      verde/cVerde,azul/cAzul,blanco/cBlancoM}{
+    \edef\temp{\noexpand\addplot[serie=\col,forget plot] table[x=VD,y=ID]{datos/\fic.dat};}
+    \temp}
+  % rectas I = a + b V entre V_u y la corriente máxima
+  \foreach \col/\a/\b/\vu/\imax in {
+      cPN/-35.005/58.209/0.601/4.33, cZener/-67.097/92.632/0.724/4.25,
+      cUV/-74.494/67.862/1.098/3.88, cRojo/-78.727/48.264/1.631/3.32,
+      cAmarillo/-60.091/34.011/1.767/3.18, cVerde/-44.739/24.768/1.806/3.10,
+      cAzul/-52.505/20.954/2.506/2.40, cBlancoM/-59.723/23.111/2.584/2.34}{
+    \edef\temp{\noexpand\addplot[ajuste=\col,domain=\vu:(\imax-(\a))/(\b),samples=2]{\a+\b*x};
+      \noexpand\fill[\col] (axis cs:\vu,0) circle (1.5pt);}
+    \temp}
+  \draw[black!50] (axis cs:0.35,0) -- (axis cs:2.98,0);
+  \foreach \x/\y/\t in {0.67/4.42/pn,0.79/4.33/Zener,1.14/3.98/IR,1.68/3.42/rojo,
+      1.83/3.28/amarillo,1.93/2.95/verde,2.62/1.75/blanco}{
+    \edef\temp{\noexpand\node[font=\noexpand\tiny,anchor=south west,inner sep=1pt] at (axis cs:\x,\y) {\t};}
+    \temp}
+  \node[font=\tiny,anchor=south east,inner sep=1pt] at (axis cs:2.55,2.3) {azul};
+\end{axis}
+\end{tikzpicture}\\[2pt]
+{\scriptsize\color{navy}$\bullet$\ $V_u=-a/b$\quad
+ \tikz\draw[dashed,thick] (0,0.08)--(0.4,0.08);\ ajuste $I=a+bV$}
