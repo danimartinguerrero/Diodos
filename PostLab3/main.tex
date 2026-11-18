@@ -1,0 +1,379 @@
+% =====================================================================
+%  PostLab 3 · Caracterización de diodos
+%  Instrumentación Electrónica · Grado en Física · USAL · 2026/2027
+%  Compilar:  latexmk -pdf main.tex
+%  - img/*.jpg: fotos corregidas con scripts/corregir_fotos.py
+%  - datos/*.dat: medidas recuperadas de Diodos_comparativa.pdf con
+%    scripts/extraer_datos.py
+% =====================================================================
+\documentclass[10pt,a4paper]{article}
+\usepackage{estilo}
+\newcommand{\Vu}{V_u}
+\colorlet{cBlancoM}{teal!70}
+
+\begin{document}
+
+% =====================================================================
+%                              PORTADA
+% =====================================================================
+\thispagestyle{empty}
+\noindent\begin{tikzpicture}[remember picture,overlay]
+  \shade[top color=azulclaro!70,bottom color=white]
+    ($(current page.north west)+(0,-0.35)$) rectangle
+    ($(current page.north east)+(0,-6.0)$);
+  \shade[left color=navy,right color=azulmed!45,middle color=azul!85]
+    (current page.north west) rectangle ($(current page.north east)+(0,-0.35)$);
+  \shade[left color=navy,right color=azulmed!45,middle color=azul!85]
+    (current page.south west) rectangle ($(current page.south east)+(0,0.35)$);
+\end{tikzpicture}\par
+\vspace*{-0.4cm}
+\noindent
+\begin{tabularx}{\linewidth}{@{}l>{\centering\arraybackslash}Xr@{}}
+  \raisebox{-.5\height}{\includegraphics[height=1.0cm]{img/logo-usal.png}} &
+  \begin{tabular}{@{}c@{}}
+    {\color{navy}\large\textls[120]{\textsc{Universidad de Salamanca}}}\\[2pt]
+    {\color{grisazul}\small\textls[100]{\textsc{Facultad de Ciencias\ \ $\cdot$\ \ Grado en Física}}}
+  \end{tabular} &
+  \raisebox{-.5\height}{\includegraphics[height=0.95cm]{img/logo-ciencias.png}}
+\end{tabularx}
+\par\vspace{6pt}
+\noindent{\color{grisclaro}\rule{\linewidth}{.6pt}}
+\vspace{0.8cm}
+
+\noindent{\color{azul}\large\textls[150]{\textsc{Instrumentación Electrónica\ \ $\cdot$\ \ PostLab 3}}}
+\par\vspace{0.3cm}
+\noindent{\fontsize{30}{36}\selectfont\bfseries\color{navy}Caracterización de diodos\par}
+\vspace{6pt}
+\noindent\tikz\shade[left color=navy,right color=white,middle color=azul]
+  (0,0) rectangle (0.5\linewidth,2.6pt);
+\par\vspace{0.35cm}
+\noindent{\large\itshape\color{black!80}
+Curvas $I_D(V_D)$ de un diodo pn, un diodo Zener y seis LED medidas con un
+DAQ y un instrumento virtual en LabVIEW; tensiones umbral, tensión Zener y
+su relación con el color de la luz emitida\par}
+\vspace{0.55cm}
+
+\noindent\input{figuras/portada_heroe.tex}
+\vspace{0.55cm}
+
+\noindent
+\begin{minipage}[t]{0.62\linewidth}
+  {\color{azul}\small\textls[120]{\textsc{Autores}}}\\[3pt]
+  {\large Miguel Martín Cortés}\ \ {\small\color{grisazul}70974284X}\\[1pt]
+  {\large Álvaro Montero Mateos}\ \ {\small\color{grisazul}71096223A}\\[1pt]
+  {\large Daniel Martín Guerrero}\ \ {\small\color{grisazul}71063727Y}
+\end{minipage}%
+\begin{minipage}[t]{0.38\linewidth}
+  {\color{azul}\small\textls[120]{\textsc{Grupo}}}\\[3pt]
+  {\large C.2}\\[6pt]
+  {\color{azul}\small\textls[120]{\textsc{Asignatura}}}\\[3pt]
+  {\large Instrumentación Electrónica}\\
+  {\small\color{grisazul}Grado en Física, 2.º curso}
+\end{minipage}
+\par\vspace{0.55cm}
+
+\noindent
+\begin{tcolorbox}[enhanced,sharp corners,boxrule=0pt,frame hidden,
+  borderline west={2.2pt}{0pt}{navy},
+  interior style={left color=azulclaro,right color=white},
+  left=9pt,right=8pt,top=6pt,bottom=6pt,width=\linewidth]
+  {\color{navy}\textls[120]{\textsc{Resumen}}}\par\vspace{3pt}
+  \small
+  Hemos construido en LabVIEW un trazador de curvas: el DAQ barre la tensión
+  aplicada a un circuito $R$--diodo de $-5$ a $\SI{5}{V}$ en 150 pasos, mide
+  la tensión del diodo y calcula su corriente. Con él medimos la característica
+  de ocho diodos y, ajustando por mínimos cuadrados el tramo de conducción,
+  obtenemos las tensiones umbral, de $\SI{0.60}{V}$ (pn) a $\SI{2.58}{V}$
+  (LED blanco), y una tensión Zener de $\SI{-1.85}{V}$. En los LED, el umbral
+  crece con la energía del fotón emitido con una pendiente de $1{,}04$, muy
+  cerca del valor ideal $eV_u\simeq hc/\lambda$.
+\end{tcolorbox}
+\par\vspace{8pt}{\color{grisclaro}\hrule height .5pt}\vspace{8pt}
+\noindent\hfill
+$I_D=\dfrac{V_{\text{in}}-V_D}{R}$\hfill
+$I_D=a+b\,V_D\ \Rightarrow\ V_u=-\dfrac{a}{b}$\hfill
+$eV_u\simeq E_g\simeq\dfrac{hc}{\lambda}$\hfill\null
+\par\vspace{8pt}{\color{grisclaro}\hrule height .5pt}
+
+\vfill
+\begin{center}
+  {\color{grisazul}\textls[120]{\textsc{Salamanca, curso académico 2026/2027}}}
+\end{center}
+\newpage
+
+% =====================================================================
+\section{Introducción y montaje}
+% =====================================================================
+
+\noindent
+\begin{minipage}[c]{0.50\linewidth}
+  \setlength{\parindent}{1.2em}
+  \indent El objetivo de la práctica es caracterizar varios diodos y determinar sus
+  tensiones umbral y, en el caso del Zener, también su tensión Zener. Medimos
+  un diodo pn de silicio, un diodo Zener y LED de color rojo, amarillo, verde,
+  azul, blanco e infrarrojo~\cite{guion_diodos}.
+
+  Usamos una tarjeta de adquisición de datos (DAQ), una resistencia de
+  $R=\SI{1}{k\ohm}$, una protoboard y un ordenador con LabVIEW. La salida
+  analógica \textbf{AO-0} impone la tensión $V_{\text{in}}$ sobre la
+  resistencia y el diodo en serie; la entrada \textbf{AI-1} mide la tensión
+  $V_D$ entre ánodo y cátodo, y la corriente se obtiene de la caída en la
+  resistencia,
+  \begin{destacada}
+    I_D\,(\si{mA})=\frac{V_{\text{in}}-V_D}{R\,(\si{k\ohm})}.
+    \label{eq:ohm}
+  \end{destacada}
+\end{minipage}\hfill
+\begin{minipage}[c]{0.47\linewidth}\centering
+  \begin{tikzpicture}[scale=0.67,transform shape]
+    \node[inner sep=0] (a) at (0,0) {\input{figuras/circuito.tex}};
+    \node[inner sep=0,anchor=west] at ($(a.east)+(0.3,0)$) {\input{figuras/protoboard.tex}};
+  \end{tikzpicture}
+  \captionof{figure}{Circuito de medida y montaje en la protoboard (adaptado
+  de~\cite{guion_diodos}).}
+  \label{fig:circuito}
+\end{minipage}
+
+% =====================================================================
+\section{El instrumento virtual en LabVIEW}
+% =====================================================================
+
+El programa funciona como un trazador de curvas \emph{cuasiestático}: impone un
+valor de $V_{\text{in}}$, espera a que el circuito se estabilice, mide $V_D$,
+calcula $I_D$ y pasa al siguiente valor. Cada punto $(V_D,I_D)$ es por tanto un
+estado estacionario.
+
+\subsection{Panel frontal}
+
+\begin{figure}[htbp]
+  \centering
+  \input{figuras/panel_anotado.tex}
+  \caption{Panel frontal del instrumento (foto de la pantalla con la
+  perspectiva corregida), tras medir el diodo pn.}
+  \label{fig:panel}
+\end{figure}
+
+El panel frontal (\cref{fig:panel}) es la interfaz con el usuario. En LabVIEW
+se distingue entre \emph{controles}, que son entradas que el usuario fija antes
+de ejecutar, e \emph{indicadores}, que son salidas que el programa escribe:
+
+\begin{itemize}[leftmargin=1.2em]
+  \item \textbf{\textcolor{ambar}{\ding{172}}\,\ding{173} Controles numéricos.}
+    \ttt{Vin\_Start} y \ttt{Vin\_End} fijan los extremos de la rampa, de $-5$
+    a $\SI{5}{V}$, que es el rango de la salida del DAQ. \ttt{Muestras} fija el
+    número de puntos (150, un paso de $\approx\SI{67}{mV}$). \ttt{R (kOhm)} es
+    el valor de la resistencia y solo interviene en el cálculo de $I_D$.
+  \item \textbf{\textcolor{cVerde}{\ding{174}} Indicador \ttt{ID (mA)}.}
+    Muestra la corriente de la iteración en curso. Al terminar queda el
+    último valor, $\SI{4.326}{mA}$, que corresponde a
+    $V_{\text{in}}=\SI{5}{V}$ y coincide con el máximo de la curva del diodo pn.
+  \item \textbf{\textcolor{azul}{\ding{175}} Imagen del circuito}
+    (\ttt{LED\_cir.png}). Es solo decorativa, pero recuerda el cableado: AO-0
+    al extremo libre de $R$, AI-1 al nudo $R$--ánodo y el cátodo a GND.
+  \item \textbf{\textcolor{navy}{\ding{176}} Control de ruta} \ttt{Guardado en}.
+    Indica el fichero de texto donde se escriben los datos.
+  \item \textbf{\textcolor{cUV}{\ding{177}} \ttt{XY Graph}.} Representa $I_D$
+    (mA, eje vertical) frente a $V_D$ (V, eje horizontal) a medida que se
+    mide. En la captura se ven el tramo de corte ($I_D\simeq0$ para $V_D<0$) y
+    la subida brusca a partir de $\approx\SI{0.6}{V}$.
+\end{itemize}
+
+\subsection{Diagrama de bloques}
+
+\begin{figure*}[htbp]
+  \centering
+  \input{figuras/diagrama_anotado.tex}
+  \caption{Diagrama de bloques del instrumento virtual (foto corregida).
+  Las letras A--H marcan las etapas funcionales y los números los elementos
+  que se describen en el texto y en la \cref{tab:simbolos}.}
+  \label{fig:bloques}
+\end{figure*}
+
+La \cref{fig:bloques} muestra el código. Lo recorremos en el orden en que
+fluyen los datos; los números remiten a la figura.
+
+\paragraph{A. Rampa de tensiones.} Los tres controles \ttt{Muestras},
+\ttt{Vin\_End} y \ttt{Vin\_Start} (1--3) entran en \ttt{Ramp Pattern} (4), que
+genera un \emph{array} de 150 valores equiespaciados entre $-5$ y $\SI{5}{V}$.
+El array (cable naranja grueso) entra en el bucle por un \emph{túnel con
+auto-indexado} (5): en cada iteración el bucle toma el siguiente elemento.
+
+\paragraph{Bucle \ttt{For}.} Repite el proceso una vez por cada valor de la
+rampa. No hace falta cablear el terminal de cuenta \ttt{N} (6), porque el
+auto-indexado fija el número de iteraciones al tamaño del array; \ttt{i} (7) es
+el índice de la iteración en curso.
+
+\paragraph{B. Temporización.} \ttt{Wait Until Next ms Multiple} (9) con la
+constante entera \ttt{100} (8) sincroniza cada iteración con un múltiplo de
+$\SI{100}{ms}$. Así se mide un punto cada $\SI{0.1}{s}$ (el barrido dura unos
+$\SI{15}{s}$) y el circuito tiene tiempo de estabilizarse.
+
+\paragraph{C--D. Salida y adquisición.} El primer \ttt{DAQ Assistant} (10)
+está configurado como \emph{generación} de tensión en \ttt{ao0}, rango
+$\pm\SI{5}{V}$ y modo \ttt{1 Sample (On Demand)}: en cada iteración escribe el
+valor de $V_{\text{in}}$ que recibe en su entrada \ttt{data}. El segundo,
+\ttt{DAQ Assistant2} (11), \emph{adquiere} una muestra de \ttt{ai1} en el mismo
+modo~\cite{ni_daq}. Ambos van encadenados por el \emph{cable de error} (19), que obliga a
+escribir antes de leer y detiene el programa si el DAQ da un fallo. La salida
+del DAQ es de tipo \emph{datos dinámicos} y \ttt{Convert from Dynamic Data}
+(12) la convierte en el número real $V_D$.
+
+\paragraph{E. Cálculo de la corriente.} Con dos operadores aritméticos,
+\ttt{Subtract} (13), que calcula $V_{\text{in}}-V_D$, y \ttt{Divide} (14), que
+divide por el control \ttt{R (kOhm)} (15), se implementa la
+ec.~\eqref{eq:ohm}. El resultado va al indicador \ttt{ID (mA)} (18).
+
+\paragraph{F. Representación.} \ttt{Build XY Graph} (16) recibe $V_D$ en
+\ttt{X Input} e $I_D$ en \ttt{Y Input} y alimenta el indicador \ttt{XY Graph}
+(17). La opción \ttt{Clear data on each call} está desactivada para que los
+puntos se acumulen y la curva se vaya dibujando.
+
+\paragraph{G. Reinicio.} Al salir del bucle, \ttt{DAQ Assistant3} (21) escribe
+la constante \ttt{0} (22) en AO-0 para no dejar el diodo polarizado. El cable de
+error que sale del bucle (19) hace que esto ocurra solo cuando el barrido ha
+terminado.
+
+\paragraph{H. Guardado.} Los valores de $V_D$ e $I_D$ salen del bucle por
+túneles con auto-indexado (20), que los acumulan en dos arrays de 150
+elementos. \ttt{Build Array} (23) los une en una matriz 2D y \ttt{Write to
+Spreadsheet File} (24) la escribe en el fichero de la ruta \ttt{Guardado en}
+(27) con el formato \ttt{\%.4e} (25), es decir, notación exponencial con cuatro
+decimales. La constante booleana \ttt{T} (26) activa \ttt{transpose}, de modo
+que cada magnitud se guarda en una columna.
+
+\begin{table}[htbp]
+  \centering\footnotesize
+  \caption{Simbología de LabVIEW que aparece en el diagrama.}
+  \label{tab:simbolos}
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabularx}{\linewidth}{@{}l X l X@{}}
+    \toprule
+    \textbf{Símbolo} & \textbf{Significado} & \textbf{Símbolo} & \textbf{Significado}\\
+    \midrule
+    \tikz\draw[Orange!85!black,line width=1pt](0,0)--(0.7,0); & número real (DBL), un valor
+      & \tikz\draw[Orange!85!black,line width=2.4pt,double=white,double distance=.5pt](0,0)--(0.7,0); & array de reales (rampa, columnas)\\
+    \tikz\draw[blue!70!black,line width=1pt](0,0)--(0.7,0); & entero (constantes \ttt{100} y \ttt{0})
+      & \tikz\draw[blue!40!black,line width=1.4pt,dash pattern=on 2pt off 1pt](0,0)--(0.7,0); & datos dinámicos (salidas del DAQ)\\
+    \tikz\draw[Goldenrod!60!black,line width=1.6pt,dash pattern=on 3pt off 1pt](0,0)--(0.7,0); & cable de error: fija el orden de ejecución
+      & \tikz\draw[magenta!80!black,line width=1pt](0,0)--(0.7,0); & cadena de texto (formato \ttt{\%.4e})\\
+    \tikz\draw[green!50!black,line width=1pt](0,0)--(0.7,0); & booleano (constante \ttt{T})
+      & \tikz\draw[teal,line width=1pt](0,0)--(0.7,0); & ruta de fichero (\ttt{Guardado en})\\
+    borde grueso, $\triangleright$ a la derecha & control (entrada)
+      & borde fino, $\triangleleft$ a la izquierda & indicador (salida)\\
+    \raisebox{-1pt}{\tikz\draw[thick,fill=white](0,0) rectangle (0.18,0.18);} en el borde del bucle & túnel (con o sin auto-indexado)
+      & \ttt{N}, \ttt{i} & n.º de iteraciones e índice del \ttt{For}\\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+% =====================================================================
+\section{Datos obtenidos}
+% =====================================================================
+
+Con el programa anterior medimos los ocho diodos. Las curvas se muestran en la
+\cref{fig:datos}: a la izquierda el barrido completo y a la derecha una
+ampliación de la zona de conducción con las rectas de ajuste del
+\cref{sec:analisis}.
+
+\begin{figure*}[htbp]
+  \centering
+  \input{figuras/datos_iv.tex}
+  \caption{Características $I_D(V_D)$ medidas. Todos los diodos están en corte
+  en inversa, salvo el Zener, que entra en ruptura en torno a $-\SI{1.2}{V}$
+  y conduce claramente a partir de $-\SI{1.85}{V}$. En directa, cada diodo
+  conduce a partir de su tensión umbral (puntos sobre el eje) y la corriente
+  máxima es $\approx(\SI{5}{V}-V_u)/R$.}
+  \label{fig:datos}
+\end{figure*}
+
+% =====================================================================
+\section{Análisis de datos}
+\label{sec:analisis}
+% =====================================================================
+
+Para determinar la tensión umbral de cada diodo tomamos los puntos en los que
+la corriente sube de forma apreciable, los ajustamos por regresión lineal a una
+recta y buscamos la tensión que anula la corriente:
+\begin{destacada}
+  I_D=a+b\,V_D\qquad\Longrightarrow\qquad V_u=-\frac{a}{b}.
+\end{destacada}
+Para el Zener aplicamos lo mismo a la rama de ruptura, lo que da la tensión
+Zener. La \cref{tab:resultados} recoge los coeficientes y los umbrales.
+
+\noindent
+\begin{minipage}[t]{0.53\linewidth}
+  \vspace{0pt}\centering\footnotesize
+  \captionof{table}{Coeficientes del ajuste $I_D=a+bV_D$ y tensiones umbral.
+  El intervalo es el rango de tensión en el que se observa el codo.}
+  \label{tab:resultados}
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabular}{@{}l r r c c@{}}
+    \toprule
+    \textbf{Diodo} & $a$ (mA) & $b$ (mA/V) & Intervalo (V) & $V_u$ (V)\\
+    \midrule
+    {\color{cPN}\rule{1.2ex}{1.2ex}}\ pn          & $-35{,}005$ & $58{,}209$ & 0,5--0,7 & \textbf{0,601}\\
+    {\color{cZener}\rule{1.2ex}{1.2ex}}\ Zener    & $-67{,}097$ & $92{,}632$ & 0,6--0,8 & \textbf{0,724}\\
+    \rowcolor{azulpalido}
+    \quad ruptura ($V_Z$)                       & $12{,}939$  & $7{,}007$  & ---      & $\mathbf{-1{,}847}$\\
+    {\color{cUV}\rule{1.2ex}{1.2ex}}\ IR          & $-74{,}494$ & $67{,}862$ & 0,9--1,1 & \textbf{1,098}\\
+    {\color{cRojo}\rule{1.2ex}{1.2ex}}\ Rojo      & $-78{,}727$ & $48{,}264$ & 1,5--1,7 & \textbf{1,631}\\
+    {\color{cAmarillo}\rule{1.2ex}{1.2ex}}\ Amarillo & $-60{,}091$ & $34{,}011$ & 1,6--1,8 & \textbf{1,767}\\
+    {\color{cVerde}\rule{1.2ex}{1.2ex}}\ Verde    & $-44{,}739$ & $24{,}768$ & 1,8--1,9 & \textbf{1,806}\\
+    {\color{cAzul}\rule{1.2ex}{1.2ex}}\ Azul      & $-52{,}505$ & $20{,}954$ & 2,4--2,5 & \textbf{2,506}\\
+    {\color{cBlancoM}\rule{1.2ex}{1.2ex}}\ Blanco  & $-59{,}723$ & $23{,}111$ & 2,4--2,6 & \textbf{2,584}\\
+    \bottomrule
+  \end{tabular}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.44\linewidth}
+  \vspace{0pt}\centering
+  \input{figuras/umbral_energia.tex}
+  \captionof{figure}{$V_u$ de los LED frente a la energía del fotón, usando
+  longitudes de onda típicas de catálogo (IR 940, rojo 625, amarillo 590,
+  verde 570, azul $\SI{470}{nm}$), no medidas.}
+  \label{fig:energia}
+\end{minipage}
+\vspace{6pt}
+
+Los coeficientes dependen de qué puntos se incluyen en la regresión, pero el
+umbral apenas cambia: al ser la subida casi vertical, $-a/b$ es poco sensible
+a la elección. Con este criterio los resultados son coherentes con los valores
+esperados, $\approx\SI{0.6}{V}$ para el silicio y entre $\SI{1}{V}$ y
+$\SI{3}{V}$ para los LED. La tensión Zener resulta $V_Z=\SI{-1.85}{V}$. Que el
+codo de ruptura sea tan suave, entre $-1{,}2$ y $-\SI{2.2}{V}$, es típico de los
+Zener de baja tensión, en los que domina el efecto túnel~\cite{sze}.
+
+\paragraph{Umbral y color.} El umbral de los LED crece con la frecuencia de la
+luz emitida, es decir, depende de su color. La razón es que para que un LED
+conduzca y emita, cada electrón que cruza la unión debe ceder una energía del
+orden del \emph{gap}, que es la energía del fotón, $E=h\nu=hc/\lambda$. De ahí
+\[
+  eV_u\simeq E_g\simeq h\nu=\frac{hc}{\lambda}.
+\]
+Por eso el LED azul tiene el umbral más alto de los monocromáticos y el
+infrarrojo el más bajo. La \cref{fig:energia} lo confirma: los cinco LED se
+alinean sobre una recta de pendiente $1{,}04$, casi la ideal, desplazada
+$\approx\SI{0.36}{V}$ por debajo. El LED blanco tiene un umbral muy parecido al
+azul porque en realidad \emph{es} un LED azul recubierto de un fósforo que
+absorbe parte de esa luz y la reemite en el amarillo; la mezcla se percibe como
+blanca~\cite{schubert}. Su umbral lo fija, por tanto, el chip azul.
+
+% =====================================================================
+\section{Conclusiones}
+% =====================================================================
+
+\begin{itemize}[leftmargin=1.2em]
+  \item El instrumento virtual automatiza la medida: el bucle \ttt{For} recorre
+    la rampa, los \ttt{DAQ Assistant} imponen y miden las tensiones, la ley de
+    Ohm da $I_D$, y los datos se representan y se guardan en columnas.
+  \item Las tensiones umbral van de $\SI{0.60}{V}$ (pn) y $\SI{0.72}{V}$
+    (Zener) a $\SI{1.10}{V}$ (IR) y $\SI{2.51}{V}$ y $\SI{2.58}{V}$ (azul y
+    blanco). La tensión Zener es $V_Z=\SI{-1.85}{V}$.
+  \item En los LED, $V_u$ crece linealmente con la energía del fotón, como
+    predice $eV_u\simeq hc/\lambda$, y el blanco se comporta como el azul.
+\end{itemize}
+
+{\small
+\bibliographystyle{unsrt}
+\bibliography{referencias}}
+
+\end{document}

@@ -1,0 +1,85 @@
+% Ilustración de la portada: diodos y LED sobre las curvas I-V medidas
+\tikzset{
+  pics/led/.style args={#1/#2/#3}{code={%
+    % halo de luz (#3 = intensidad)
+    \foreach \r/\o in {2.3/0.05,1.8/0.08,1.4/0.11,1.1/0.14}
+      \fill[#2,opacity=#3*\o] (0,2.2) circle (\r);
+    % patillas: ánodo (larga) y cátodo (corta)
+    \fill[gray!60,draw=gray!30,line width=.2pt] (-0.42,-2.5) rectangle (-0.30,0);
+    \fill[gray!60,draw=gray!30,line width=.2pt] (0.30,-2.0) rectangle (0.42,0);
+    % electrodos internos: poste (ánodo) y yunque (cátodo)
+    \fill[gray!55,opacity=.85] (-0.42,0) -- (-0.42,1.45) -- (-0.18,1.62) -- (-0.08,1.62)
+      -- (-0.08,1.35) -- (-0.30,1.25) -- (-0.30,0) -- cycle;
+    \fill[gray!55,opacity=.85] (-0.02,0.8) -- (-0.02,1.55) -- (0.08,1.55) -- (0.18,1.25)
+      -- (0.48,1.25) -- (0.58,1.55) -- (0.72,1.55) -- (0.72,0.8) -- (0.42,0.8)
+      -- (0.42,0) -- (0.30,0) -- (0.30,0.8) -- cycle;
+    \fill[white,opacity=#3*.9] (0.33,1.33) circle (0.08);
+    % cápsula de epoxi
+    \shade[left color=#1!70!black,right color=#1!45!white,middle color=#1,opacity=.80]
+      (-0.9,0.28) -- (-0.9,2.2) arc (180:0:0.9) -- (0.9,0.28) -- cycle;
+    \fill[white,opacity=.40,rounded corners=2pt] (-0.70,0.50) rectangle (-0.52,2.15);
+    \fill[white,opacity=.25] (-0.35,2.75) circle (0.18);
+    \shade[top color=#1!75!white,bottom color=#1!60!black,opacity=.95]
+      (-1.05,0) rectangle (0.95,0.28);
+    \draw[#1!40!black,line width=.35pt] (-0.9,0.28) -- (-0.9,2.2) arc (180:0:0.9) -- (0.9,0.28);
+  }},
+  pics/axial/.style args={#1/#2/#3}{code={%
+    \draw[gray!55,line width=1.1pt] (-2.1,0) -- (2.1,0);
+    \shade[top color=#1!60!white,bottom color=#1!70!black,middle color=#1,rounded corners=3pt]
+      (-0.95,-0.34) rectangle (0.95,0.34);
+    \fill[white,opacity=.25,rounded corners=2pt] (-0.85,0.12) rectangle (0.85,0.26);
+    \fill[#2] (#3,-0.34) rectangle ($(#3,0.34)+(0.2,0)$);
+  }},
+}
+\colorlet{dpn}{black!80}\colorlet{dzener}{orange!75!red}
+\colorlet{ledIR}{violet!45!gray}\colorlet{ledB}{white!80!gray}
+\begin{tikzpicture}
+  \def\W{16.9}\def\H{6.3}
+  \begin{scope}
+    \clip[rounded corners=6pt] (0,0) rectangle (\W,\H);
+    \shade[left color=navy!95!black,right color=azul!75!navy] (0,0) rectangle (\W,\H);
+    \fill[white,opacity=.04] (\W*0.55,\H) circle (5.5);
+    % curvas I-V medidas, en segundo plano
+    \begin{axis}[at={(0,0)},anchor=south west,scale only axis,width=\W cm,height=\H cm,
+      hide axis,xmin=-2.7,xmax=3.0,ymin=-3.1,ymax=4.9,clip=false]
+      \draw[white,opacity=.18] (axis cs:-2.7,0) -- (axis cs:3,0);
+      \draw[white,opacity=.18] (axis cs:0,-3.1) -- (axis cs:0,4.9);
+      \foreach \fic/\col in {pn/gray!40,zener/cZener,ir/violet!70,rojo/cRojo,
+          amarillo/Gold,verde/cVerde,azul/cAzul!70!cyan,blanco/cyan!40}{
+        \edef\temp{\noexpand\addplot[\col,line width=1.3pt,opacity=.38]
+          table[x=VD,y=ID]{datos/\fic.dat};}
+        \temp}
+    \end{axis}
+  \end{scope}
+  \draw[white,opacity=.25,rounded corners=6pt] (0,0) rectangle (\W,\H);
+  % ---------- diodos de unión
+  \pic[scale=0.62] at (2.65,4.6) {axial=dpn/gray!15/0.42};
+  \node[white,font=\sffamily\scriptsize,align=center] at (2.65,4.0)
+    {\textbf{Diodo pn}\ \ $V_u=\SI{0.60}{V}$};
+  \pic[scale=0.62] at (2.65,2.85) {axial=dzener/black!85/0.42};
+  \node[white,font=\sffamily\scriptsize,align=center] at (2.65,2.25)
+    {\textbf{Zener}\ \ $V_u=\SI{0.72}{V}$\ \ $|V_Z|=\SI{1.85}{V}$};
+  % símbolos
+  \begin{scope}[shift={(0.55,0.75)},scale=0.62,transform shape,color=white]
+    \draw[white] (0,0) to[D*,color=white] (1.9,0);
+    \draw[white] (2.5,0) to[zD*,color=white] (4.4,0);
+    \draw[white] (5.0,0) to[leD*,color=white] (6.9,0);
+  \end{scope}
+  % ---------- LED
+  \foreach \x/\cb/\cg/\i/\n/\v in {
+      6.2/ledIR/violet/0.55/IR/1.10,
+      7.9/cRojo/red/1/Rojo/1.63,
+      9.6/Gold/yellow/1/Amarillo/1.77,
+      11.3/cVerde/green/1/Verde/1.81,
+      13.0/cAzul/cyan!60!blue/1/Azul/2.51,
+      14.7/ledB/white/1/Blanco/2.58}{
+    \begin{scope}
+      \clip[rounded corners=6pt] (0,0) rectangle (\W,\H);
+      \pic[scale=0.78] at (\x,2.0) {led=\cb/\cg/\i};
+    \end{scope}
+    \node[white,font=\sffamily\scriptsize\bfseries] at (\x,5.18) {\n};
+    \node[white,opacity=.9,font=\sffamily\tiny] at (\x,4.86) {$V_u=\SI{\v}{V}$};
+  }
+  \draw[-{Stealth[length=5pt]},white,opacity=.7] (6.4,5.75) -- (14.7,5.75)
+    node[midway,above=-1pt,font=\sffamily\tiny,opacity=1]{menor $\lambda$\ \ $\Rightarrow$\ \ mayor tensión umbral};
+\end{tikzpicture}
