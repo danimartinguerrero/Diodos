@@ -2,7 +2,7 @@
 \begin{tikzpicture}
 \begin{axis}[width=\linewidth,height=5.3cm,xmin=1.15,xmax=2.85,ymin=0.9,ymax=2.9,
   xlabel={$E_{\text{ph}}=hc/\lambda$ (eV)},ylabel={$V_u$ (V)},grid=major,
-  legend pos=north west,legend style={font=\tiny},legend cell align=left]
+  legend pos=south east,legend style={font=\tiny},legend cell align=left]
   \addplot[grisazul,thick,domain=1.15:2.85,samples=2]{x};
   \addlegendentry{$eV_u=E_{\text{ph}}$}
   \addplot[azul,dashed,thick,domain=1.15:2.85,samples=2]{1.0385*x-0.3605};

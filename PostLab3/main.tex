@@ -102,36 +102,22 @@ $eV_u\simeq E_g\simeq\dfrac{hc}{\lambda}$\hfill\null
 \newpage
 
 % =====================================================================
-\section{Introducción y montaje}
+\section{Introducción}
 % =====================================================================
 
 \noindent
 \begin{minipage}[c]{0.50\linewidth}
-  \setlength{\parindent}{1.2em}
-  \indent El objetivo de la práctica es caracterizar varios diodos y determinar sus
-  tensiones umbral y, en el caso del Zener, también su tensión Zener. Medimos
-  un diodo pn de silicio, un diodo Zener y LED de color rojo, amarillo, verde,
-  azul, blanco e infrarrojo~\cite{guion_diodos}.
-
-  Usamos una tarjeta de adquisición de datos (DAQ), una resistencia de
-  $R=\SI{1}{k\ohm}$, una protoboard y un ordenador con LabVIEW. La salida
-  analógica \textbf{AO-0} impone la tensión $V_{\text{in}}$ sobre la
-  resistencia y el diodo en serie; la entrada \textbf{AI-1} mide la tensión
-  $V_D$ entre ánodo y cátodo, y la corriente se obtiene de la caída en la
-  resistencia,
-  \begin{destacada}
-    I_D\,(\si{mA})=\frac{V_{\text{in}}-V_D}{R\,(\si{k\ohm})}.
-    \label{eq:ohm}
-  \end{destacada}
+  El objetivo de esta práctica es caracterizar una serie de diodos y determinar sus tensiones umbral. En caso del diodo Zener, determinar a su vez la tensión Zener.
+  \par\vspace{0.3cm}
+  Para la realización se hizo uso de una tarjeta de adquisición de datos o DAQ, cables, una resistencia, diodos (p-n, Zener, rojo, verde, azul, amarillo, blanco e infrarrojo) y un ordenador con el programa de intrumentación virtual LabView.El esquema del montaje se muestra a continuación:
 \end{minipage}\hfill
 \begin{minipage}[c]{0.47\linewidth}\centering
   \begin{tikzpicture}[scale=0.67,transform shape]
     \node[inner sep=0] (a) at (0,0) {\input{figuras/circuito.tex}};
     \node[inner sep=0,anchor=west] at ($(a.east)+(0.3,0)$) {\input{figuras/protoboard.tex}};
   \end{tikzpicture}
-  \captionof{figure}{Circuito de medida y montaje en la protoboard (adaptado
-  de~\cite{guion_diodos}).}
-  \label{fig:circuito}
+  \captionof{figure}{Montaje del circuito para la caracterización de los diodos \cite{guion_diodos}.}
+  \label{fig:guiondiodos}
 \end{minipage}
 
 % =====================================================================
@@ -220,8 +206,13 @@ del DAQ es de tipo \emph{datos dinámicos} y \ttt{Convert from Dynamic Data}
 
 \paragraph{E. Cálculo de la corriente.} Con dos operadores aritméticos,
 \ttt{Subtract} (13), que calcula $V_{\text{in}}-V_D$, y \ttt{Divide} (14), que
-divide por el control \ttt{R (kOhm)} (15), se implementa la
-ec.~\eqref{eq:ohm}. El resultado va al indicador \ttt{ID (mA)} (18).
+divide por el control \ttt{R (kOhm)} (15), se implementa la ley de Ohm en la
+resistencia,
+\begin{destacada}
+  I_D\,(\si{mA})=\frac{V_{\text{in}}-V_D}{R\,(\si{k\ohm})}.
+  \label{eq:ohm}
+\end{destacada}
+El resultado va al indicador \ttt{ID (mA)} (18).
 
 \paragraph{F. Representación.} \ttt{Build XY Graph} (16) recibe $V_D$ en
 \ttt{X Input} e $I_D$ en \ttt{Y Input} y alimenta el indicador \ttt{XY Graph}
@@ -269,108 +260,112 @@ que cada magnitud se guarda en una columna.
 % =====================================================================
 \section{Datos obtenidos}
 % =====================================================================
-
-Con el programa anterior medimos los ocho diodos. Las curvas se muestran en la
-\cref{fig:datos}: a la izquierda el barrido completo y a la derecha una
-ampliación de la zona de conducción con las rectas de ajuste del
-\cref{sec:analisis}.
-
-\begin{figure*}[htbp]
+Para poder tomar los datos se utilizó el programa mostrado en el apartado anterior y el circuito constituido por el diodo y una resistencia.
+\par\vspace{0.2cm}
+Las medidas tomadas para cada diodo se representaron gráficamente y se muestran a continuación:
+\begin{figure}[htbp]
   \centering
   \input{figuras/datos_iv.tex}
-  \caption{Características $I_D(V_D)$ medidas. Todos los diodos están en corte
-  en inversa, salvo el Zener, que entra en ruptura en torno a $-\SI{1.2}{V}$
-  y conduce claramente a partir de $-\SI{1.85}{V}$. En directa, cada diodo
-  conduce a partir de su tensión umbral (puntos sobre el eje) y la corriente
-  máxima es $\approx(\SI{5}{V}-V_u)/R$.}
-  \label{fig:datos}
-\end{figure*}
+  \caption{Comparativa de cada representación $I_D(V_D)$ para cada diodo. (a)
+  Barrido completo; (b) ampliación de la rama directa con las rectas de
+  ajuste del \cref{sec:analisis}.}
+  \label{fig:caida}
+\end{figure}
 
 % =====================================================================
 \section{Análisis de datos}
 \label{sec:analisis}
 % =====================================================================
+Observando los datos obtenidos, podemos determinar las tensiones umbral para cada diodo. Para esta empresa, hemos considerado que la mejor opción es aproximar aquellos puntos donde se observe una subida de intensidad considerable y aproximar todos esos puntos a una recta mediante una regresión lineal, para posteriormente buscar aquel valor de la tensión tal que hace cero la intensidad para cada una de las retas, determinando así la tensión umbral ($V_u$) para cada diodo.
 
-Para determinar la tensión umbral de cada diodo tomamos los puntos en los que
-la corriente sube de forma apreciable, los ajustamos por regresión lineal a una
-recta y buscamos la tensión que anula la corriente:
+\medskip
+La recta de ajuste será:
 \begin{destacada}
-  I_D=a+b\,V_D\qquad\Longrightarrow\qquad V_u=-\frac{a}{b}.
+    I = a +bV
+    \nonumber
 \end{destacada}
-Para el Zener aplicamos lo mismo a la rama de ruptura, lo que da la tensión
-Zener. La \cref{tab:resultados} recoge los coeficientes y los umbrales.
+
+\medskip
+Hemos obtenido los siguientes coeficientes para cada diodo:
 
 \noindent
-\begin{minipage}[t]{0.53\linewidth}
+\begin{minipage}[t]{0.48\linewidth}
   \vspace{0pt}\centering\footnotesize
-  \captionof{table}{Coeficientes del ajuste $I_D=a+bV_D$ y tensiones umbral.
-  El intervalo es el rango de tensión en el que se observa el codo.}
-  \label{tab:resultados}
   \renewcommand{\arraystretch}{1.12}
-  \begin{tabular}{@{}l r r c c@{}}
+  \begin{tabular}{@{}l c c@{}}
     \toprule
-    \textbf{Diodo} & $a$ (mA) & $b$ (mA/V) & Intervalo (V) & $V_u$ (V)\\
+    Diodo & a & b\\
     \midrule
-    {\color{cPN}\rule{1.2ex}{1.2ex}}\ pn          & $-35{,}005$ & $58{,}209$ & 0,5--0,7 & \textbf{0,601}\\
-    {\color{cZener}\rule{1.2ex}{1.2ex}}\ Zener    & $-67{,}097$ & $92{,}632$ & 0,6--0,8 & \textbf{0,724}\\
-    \rowcolor{azulpalido}
-    \quad ruptura ($V_Z$)                       & $12{,}939$  & $7{,}007$  & ---      & $\mathbf{-1{,}847}$\\
-    {\color{cUV}\rule{1.2ex}{1.2ex}}\ IR          & $-74{,}494$ & $67{,}862$ & 0,9--1,1 & \textbf{1,098}\\
-    {\color{cRojo}\rule{1.2ex}{1.2ex}}\ Rojo      & $-78{,}727$ & $48{,}264$ & 1,5--1,7 & \textbf{1,631}\\
-    {\color{cAmarillo}\rule{1.2ex}{1.2ex}}\ Amarillo & $-60{,}091$ & $34{,}011$ & 1,6--1,8 & \textbf{1,767}\\
-    {\color{cVerde}\rule{1.2ex}{1.2ex}}\ Verde    & $-44{,}739$ & $24{,}768$ & 1,8--1,9 & \textbf{1,806}\\
-    {\color{cAzul}\rule{1.2ex}{1.2ex}}\ Azul      & $-52{,}505$ & $20{,}954$ & 2,4--2,5 & \textbf{2,506}\\
-    {\color{cBlancoM}\rule{1.2ex}{1.2ex}}\ Blanco  & $-59{,}723$ & $23{,}111$ & 2,4--2,6 & \textbf{2,584}\\
+    {\color{cPN}\rule{1.2ex}{1.2ex}}\ p-n & -35,005 & 58,209\\
+    {\color{cZener}\rule{1.2ex}{1.2ex}}\ Zener & -67,097 & 92,632\\
+    {\color{cZener}\rule{1.2ex}{1.2ex}}\ Zener ($V_{zener}$) & 12,939 & 7,007\\
+    {\color{cBlancoM}\rule{1.2ex}{1.2ex}}\ Blanco & -59,723 & 23,111\\
+    {\color{cAzul}\rule{1.2ex}{1.2ex}}\ Azul & -52,505 & 20,954\\
+    {\color{cVerde}\rule{1.2ex}{1.2ex}}\ Verde & -44,739 & 24,768\\
+    {\color{cAmarillo}\rule{1.2ex}{1.2ex}}\ Amarillo & -60,091 & 34,011\\
+    {\color{cRojo}\rule{1.2ex}{1.2ex}}\ Rojo & -78,727 & 48,264\\
+    {\color{cUV}\rule{1.2ex}{1.2ex}}\ Infrarrojo & -74,494 & 67,862\\
     \bottomrule
   \end{tabular}
+  \captionof{table}{Coeficientes de ajuste para cada diodo, obtenidos mediante regresión lineal.}
+  \label{tab:coef}
 \end{minipage}\hfill
-\begin{minipage}[t]{0.44\linewidth}
-  \vspace{0pt}\centering
-  \input{figuras/umbral_energia.tex}
-  \captionof{figure}{$V_u$ de los LED frente a la energía del fotón, usando
-  longitudes de onda típicas de catálogo (IR 940, rojo 625, amarillo 590,
-  verde 570, azul $\SI{470}{nm}$), no medidas.}
-  \label{fig:energia}
+\begin{minipage}[t]{0.48\linewidth}
+  \vspace{0pt}\centering\footnotesize
+  \renewcommand{\arraystretch}{1.12}
+  \begin{tabular}{@{}l c c@{}}
+    \toprule
+    Diodo & Intervalo $V_{u}$ [V] & Estimación $V_u$ [V]\\
+    \midrule
+    {\color{cPN}\rule{1.2ex}{1.2ex}}\ p-n & $0.5-0.7$ & 0,601\\
+    {\color{cZener}\rule{1.2ex}{1.2ex}}\ Zener & $0.6-0.8$ & 0,724\\
+    {\color{cBlancoM}\rule{1.2ex}{1.2ex}}\ Blanco & $2.4-2.6$ & 2,584\\
+    {\color{cAzul}\rule{1.2ex}{1.2ex}}\ Azul & $2.4-2.5$ & 2,506\\
+    {\color{cVerde}\rule{1.2ex}{1.2ex}}\ Verde & $1.8-1.9$ & 1,806\\
+    {\color{cAmarillo}\rule{1.2ex}{1.2ex}}\ Amarillo & $1.6-1.8$ & 1,767\\
+    {\color{cRojo}\rule{1.2ex}{1.2ex}}\ Rojo & $1.5-1.7$ & 1,631\\
+    {\color{cUV}\rule{1.2ex}{1.2ex}}\ Infrarrojo & $0.9-1.1$ & 1,098\\
+    \bottomrule
+  \end{tabular}
+  \captionof{table}{Tensiones umbrales para cada diodo.}
+  \label{tab:umbrales}
 \end{minipage}
-\vspace{6pt}
 
-Los coeficientes dependen de qué puntos se incluyen en la regresión, pero el
-umbral apenas cambia: al ser la subida casi vertical, $-a/b$ es poco sensible
-a la elección. Con este criterio los resultados son coherentes con los valores
-esperados, $\approx\SI{0.6}{V}$ para el silicio y entre $\SI{1}{V}$ y
-$\SI{3}{V}$ para los LED. La tensión Zener resulta $V_Z=\SI{-1.85}{V}$. Que el
-codo de ruptura sea tan suave, entre $-1{,}2$ y $-\SI{2.2}{V}$, es típico de los
-Zener de baja tensión, en los que domina el efecto túnel~\cite{sze}.
+\medskip
+A partir de los coeficientes calculados en la tabla anterior obtenemos las tensiones umbral para cada uno de los diodos (\cref{tab:umbrales}).
 
-\paragraph{Umbral y color.} El umbral de los LED crece con la frecuencia de la
-luz emitida, es decir, depende de su color. La razón es que para que un LED
-conduzca y emita, cada electrón que cruza la unión debe ceder una energía del
-orden del \emph{gap}, que es la energía del fotón, $E=h\nu=hc/\lambda$. De ahí
-\[
-  eV_u\simeq E_g\simeq h\nu=\frac{hc}{\lambda}.
-\]
-Por eso el LED azul tiene el umbral más alto de los monocromáticos y el
-infrarrojo el más bajo. La \cref{fig:energia} lo confirma: los cinco LED se
-alinean sobre una recta de pendiente $1{,}04$, casi la ideal, desplazada
-$\approx\SI{0.36}{V}$ por debajo. El LED blanco tiene un umbral muy parecido al
-azul porque en realidad \emph{es} un LED azul recubierto de un fósforo que
-absorbe parte de esa luz y la reemite en el amarillo; la mezcla se percibe como
-blanca~\cite{schubert}. Su umbral lo fija, por tanto, el chip azul.
+\medskip
+Destacar que por supuesto el valor exacto de los coeficientes varía en función de los puntos que utilicemos para realizar la regresión, sin embargo, concluimos que con el criterio utilizado para esta caracterización obtenemos resultados satisfactorios.
 
-% =====================================================================
-\section{Conclusiones}
-% =====================================================================
+\medskip
+Por otro lado, también podemos determinar la tensión Zener. En este caso hemos estimado un valor de: $V_z = -1.847\hspace{0.2cm}\text{V}$.
 
-\begin{itemize}[leftmargin=1.2em]
-  \item El instrumento virtual automatiza la medida: el bucle \ttt{For} recorre
-    la rampa, los \ttt{DAQ Assistant} imponen y miden las tensiones, la ley de
-    Ohm da $I_D$, y los datos se representan y se guardan en columnas.
-  \item Las tensiones umbral van de $\SI{0.60}{V}$ (pn) y $\SI{0.72}{V}$
-    (Zener) a $\SI{1.10}{V}$ (IR) y $\SI{2.51}{V}$ y $\SI{2.58}{V}$ (azul y
-    blanco). La tensión Zener es $V_Z=\SI{-1.85}{V}$.
-  \item En los LED, $V_u$ crece linealmente con la energía del fotón, como
-    predice $eV_u\simeq hc/\lambda$, y el blanco se comporta como el azul.
-\end{itemize}
+\medskip
+Como comentario final, observamos que la tensión umbral de los LEDs aumenta con la frecuencia de la radiación electromagnética emitida y, por tanto, depende de su longitud de onda, es decir, de su color. A mayor frecuencia, mayor es la tensión que hay que aplicar para que el diodo sea capaz de conducir. Esto se debe a que la energía del fotón emitido es proporcional a su frecuencia, según el postulado de cuantización de Planck:
+\begin{destacada}
+    E = h\nu
+\end{destacada}
+
+\medskip
+Por ende, se sigue que el LED azul deberá tener una tensión umbral mayor que cualquier otro, ya que es necesaria más energía para poder emitir luz de dicho color, lo cuál se ha demostrado con los resultados obtenidos.
+
+\medskip
+Asimismo, se observa que el LED blanco también posee una tensión umbral similar, esto es debido a que, en función de obtener luz blanca, se utiliza un LED azul con un recubrimiento de un material foto-luminiscente denominado fósforo, que da la sensación de blanco al ojo humano. Por ello, es esperable que las tensiones umbrales tanto del LED azul como del blanco sean similares.
+
+\begin{figure}[htbp]
+  \centering
+  \begin{minipage}[c]{0.46\linewidth}\centering
+    \input{figuras/umbral_energia.tex}
+  \end{minipage}\hfill
+  \begin{minipage}[c]{0.5\linewidth}
+    \captionof{figure}{Complemento: $V_u$ de los LED de la \cref{tab:umbrales}
+    frente a la energía del fotón $E=h\nu=hc/\lambda$, tomando longitudes de
+    onda típicas de catálogo (IR 940, rojo 625, amarillo 590, verde 570, azul
+    $\SI{470}{nm}$), no medidas. Los puntos se alinean sobre una recta de
+    pendiente $1{,}04$, muy próxima a la relación ideal $eV_u=h\nu$.}
+    \label{fig:energia}
+  \end{minipage}
+\end{figure}
 
 {\small
 \bibliographystyle{unsrt}
